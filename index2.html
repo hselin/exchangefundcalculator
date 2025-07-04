@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Exchange Fund Break-Even Expense Ratio Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #10B981, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .chart-container {
             position: relative;
@@ -26,23 +34,23 @@
             appearance: none;
             width: 20px;
             height: 20px;
-            background: #0d9488;
+            background: #10B981; /* emerald-500 */
             cursor: pointer;
             border-radius: 50%;
         }
         input[type=range]::-moz-range-thumb {
             width: 20px;
             height: 20px;
-            background: #0d9488;
+            background: #10B981; /* emerald-500 */
             cursor: pointer;
             border-radius: 50%;
         }
         .toggle-checkbox:checked {
             right: 0;
-            border-color: #0d9488;
+            border-color: #10B981;
         }
         .toggle-checkbox:checked + .toggle-label {
-            background-color: #0d9488;
+            background-color: #10B981;
         }
         input[type=range].slider-error::-webkit-slider-thumb {
             background: #ef4444;
@@ -52,180 +60,182 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-900 text-gray-300">
 
     <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-        <header class="text-center mb-12">
-            <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-4">The Challenge of Concentrated Wealth</h1>
-            <p class="max-w-3xl mx-auto text-lg text-gray-700 leading-relaxed mb-8">
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
+                The Challenge of <span class="gradient-text">Concentrated Wealth</span>
+            </h1>
+            <p class="max-w-3xl mx-auto text-lg text-gray-400 leading-relaxed mb-8">
                 Holding a large, appreciated stock position is a good problem to have - but now what? Selling means a big tax hit. An exchange fund offers tax deferral, but is it worth the fee? This tool helps you make that decision with data. It compares your portfolio’s projected value under both scenarios and shows the break-even expense ratio — the highest fee an exchange fund can charge while still leaving you better off than selling and paying taxes today.
             </p>
         </header>
 
-        <hr class="my-12 border-gray-200">
+        <hr class="my-12 border-gray-700">
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <aside class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
-                <h2 class="text-2xl font-bold mb-6 text-teal-700 text-center">Financial Inputs</h2>
+            <aside class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 text-white text-center">Financial Inputs</h2>
 
                 <div class="space-y-6">
                     <div>
-                        <h3 class="text-lg font-semibold mb-4 text-teal-600">Initial Investment & Tax Rate</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-emerald-400">Initial Investment & Tax Rate</h3>
                         <div class="space-y-4">
                              <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="currentValue" class="block text-sm font-medium text-gray-700">Current Market Value ($)</label>
+                                    <label for="currentValue" class="block text-sm font-medium text-gray-300">Current Market Value ($)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The current market price of your concentrated stock position.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The current market price of your concentrated stock position.</div>
                                     </div>
                                 </div>
-                                <input type="text" id="currentValue" value="1,000,000" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 text-lg px-2 py-1">
+                                <input type="text" id="currentValue" value="1,000,000" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg px-2 py-1 border border-gray-600">
                             </div>
                             <div>
                                  <div class="flex justify-between items-center">
-                                    <label for="costBasis" class="block text-sm font-medium text-gray-700">Cost Basis ($)</label>
+                                    <label for="costBasis" class="block text-sm font-medium text-gray-300">Cost Basis ($)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">How much you paid for the concentrated stock position, including commissions.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">How much you paid for the concentrated stock position, including commissions.</div>
                                     </div>
                                 </div>
-                                <input type="text" id="costBasis" value="200,000" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 text-lg px-2 py-1">
+                                <input type="text" id="costBasis" value="200,000" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg px-2 py-1 border border-gray-600">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="taxRate" class="block text-sm font-medium text-gray-700">Tax Rate (%)</label>
+                                    <label for="taxRate" class="block text-sm font-medium text-gray-300">Tax Rate (%)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">Your combined federal and state tax rate.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">Your combined federal and state tax rate.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="taxRate" min="10" max="50" step="0.1" value="23.8" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="taxRateValue" class="block text-right font-semibold text-teal-600">23.8%</span>
+                                <input type="range" id="taxRate" min="10" max="50" step="0.1" value="23.8" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="taxRateValue" class="block text-right font-semibold text-emerald-400">23.8%</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t">
-                        <h3 class="text-lg font-semibold mb-4 text-teal-600">Return Assumptions</h3>
+                    <div class="pt-4 border-t border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4 text-emerald-400">Return Assumptions</h3>
                          <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="scenarioAAnnualReturn" class="block text-sm font-medium text-gray-700">Sell & Reinvest Annual Return (%)</label>
+                                    <label for="scenarioAAnnualReturn" class="block text-sm font-medium text-gray-300">Sell & Reinvest Annual Return (%)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the investment you'd buy after selling your concentrated stock. The S&P 500 has averaged around 10% annually since 1957.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the investment you'd buy after selling your concentrated stock. The S&P 500 has averaged around 10% annually since 1957.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="scenarioAAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="scenarioAAnnualReturnValue" class="block text-right font-semibold text-teal-600">10.0%</span>
+                                <input type="range" id="scenarioAAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="scenarioAAnnualReturnValue" class="block text-right font-semibold text-emerald-400">10.0%</span>
                             </div>
                             <div>
                                  <div class="flex justify-between items-center">
-                                    <label for="exchangeFundAnnualReturn" class="block text-sm font-medium text-gray-700">Exchange Fund Annual Return (%)</label>
+                                    <label for="exchangeFundAnnualReturn" class="block text-sm font-medium text-gray-300">Exchange Fund Annual Return (%)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the exchange fund before fees. The S&P 500 has averaged about 10% annually since 1957.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the exchange fund before fees. The S&P 500 has averaged about 10% annually since 1957.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="exchangeFundAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="exchangeFundAnnualReturnValue" class="block text-right font-semibold text-teal-600">10.0%</span>
+                                <input type="range" id="exchangeFundAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="exchangeFundAnnualReturnValue" class="block text-right font-semibold text-emerald-400">10.0%</span>
                             </div>
                             <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="postFundAnnualReturn" class="block text-sm font-medium text-gray-700">Exchange Fund Post-Redemption Annual Return (%)</label>
+                                    <label for="postFundAnnualReturn" class="block text-sm font-medium text-gray-300">Exchange Fund Post-Redemption Annual Return (%)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the investment you’d own after exiting the exchange fund. The S&P 500 has averaged about 10% annually since 1957.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the investment you’d own after exiting the exchange fund. The S&P 500 has averaged about 10% annually since 1957.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="postFundAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="postFundAnnualReturnValue" class="block text-right font-semibold text-teal-600">10.0%</span>
+                                <input type="range" id="postFundAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="postFundAnnualReturnValue" class="block text-right font-semibold text-emerald-400">10.0%</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t">
-                        <h3 class="text-lg font-semibold mb-4 text-teal-600">Market Assumptions</h3>
+                    <div class="pt-4 border-t border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4 text-emerald-400">Market Assumptions</h3>
                         <div class="space-y-4">
                              <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="inflation" class="block text-sm font-medium text-gray-700">Annual Inflation (%)</label>
+                                    <label for="inflation" class="block text-sm font-medium text-gray-300">Annual Inflation (%)</label>
                                      <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected average annual inflation rate over your investment horizon. This is used to calculate real, after-tax returns. Historically, U.S. inflation has averaged about 3.3% annually.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected average annual inflation rate over your investment horizon. This is used to calculate real, after-tax returns. Historically, U.S. inflation has averaged about 3.3% annually.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="inflation" min="0" max="10" step="0.1" value="3.3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="inflationValue" class="block text-right font-semibold text-teal-600">3.3%</span>
+                                <input type="range" id="inflation" min="0" max="10" step="0.1" value="3.3" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="inflationValue" class="block text-right font-semibold text-emerald-400">3.3%</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t">
-                        <h3 class="text-lg font-semibold mb-4 text-teal-600">Time Frames</h3>
+                    <div class="pt-4 border-t border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4 text-emerald-400">Time Frames</h3>
                         <div class="space-y-4">
                              <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="timeHorizon" class="block text-sm font-medium text-gray-700">Total Investment Horizon (Years)</label>
+                                    <label for="timeHorizon" class="block text-sm font-medium text-gray-300">Total Investment Horizon (Years)</label>
                                      <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The number of years you expect to remain invested, whether using an exchange fund or selling & reinvesting.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The number of years you expect to remain invested, whether using an exchange fund or selling & reinvesting.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="timeHorizon" min="0" max="40" step="1" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="timeHorizonValue" class="block text-right font-semibold text-teal-600">20 Years</span>
+                                <input type="range" id="timeHorizon" min="0" max="40" step="1" value="20" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="timeHorizonValue" class="block text-right font-semibold text-emerald-400">20 Years</span>
                             </div>
                              <div id="exchangeFundPeriodContainer">
                                 <div class="flex justify-between items-center">
-                                    <label for="exchangeFundPeriod" class="block text-sm font-medium text-gray-700">Exchange Fund Period (Years)</label>
+                                    <label for="exchangeFundPeriod" class="block text-sm font-medium text-gray-300">Exchange Fund Period (Years)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The number of years you plan to stay in the exchange fund before redeeming your shares (typically 7 years).</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The number of years you plan to stay in the exchange fund before redeeming your shares (typically 7 years).</div>
                                     </div>
                                 </div>
-                                <input type="range" id="exchangeFundPeriod" min="0" max="40" step="1" value="7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="exchangeFundPeriodValue" class="block text-right font-semibold text-teal-600">7 Years</span>
+                                <input type="range" id="exchangeFundPeriod" min="0" max="40" step="1" value="7" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="exchangeFundPeriodValue" class="block text-right font-semibold text-emerald-400">7 Years</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t">
-                         <h3 class="text-lg font-semibold mb-4 text-teal-600">Expense Ratios</h3>
+                    <div class="pt-4 border-t border-gray-700">
+                         <h3 class="text-lg font-semibold mb-4 text-emerald-400">Expense Ratios</h3>
                          <div class="space-y-4">
                              <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="scenarioAER" class="block text-sm font-medium text-gray-700">Sell & Reinvest Expense Ratio (%)</label>
+                                    <label for="scenarioAER" class="block text-sm font-medium text-gray-300">Sell & Reinvest Expense Ratio (%)</label>
                                     <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the investment you would buy in the sell & reinvest scenario. Expense ratio of VOO is 0.03%.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the investment you would buy in the sell & reinvest scenario. Expense ratio of VOO is 0.03%.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="scenarioAER" min="0" max="1" step="0.01" value="0.03" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="scenarioAERValue" class="block text-right font-semibold text-teal-600">0.03%</span>
+                                <input type="range" id="scenarioAER" min="0" max="1" step="0.01" value="0.03" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="scenarioAERValue" class="block text-right font-semibold text-emerald-400">0.03%</span>
                             </div>
                             <div>
                                 <div class="flex justify-between items-center">
-                                    <label for="exchangeFundER" class="block text-sm font-medium text-gray-700">Exchange Fund Expense Ratio (%)</label>
+                                    <label for="exchangeFundER" class="block text-sm font-medium text-gray-300">Exchange Fund Expense Ratio (%)</label>
                                      <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the exchange fund you’re considering.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the exchange fund you’re considering.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="exchangeFundER" min="0" max="3" step="0.01" value="1.25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="exchangeFundERValue" class="block text-right font-semibold text-teal-600">1.25%</span>
+                                <input type="range" id="exchangeFundER" min="0" max="3" step="0.01" value="1.25" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="exchangeFundERValue" class="block text-right font-semibold text-emerald-400">1.25%</span>
                             </div>
                             <div>
                                  <div class="flex justify-between items-center">
-                                    <label for="postFundER" class="block text-sm font-medium text-gray-700">Exchange Fund Post-Redemption ER (%)</label>
+                                    <label for="postFundER" class="block text-sm font-medium text-gray-300">Exchange Fund Post-Redemption ER (%)</label>
                                      <div class="relative group">
-                                        <span class="text-teal-600 cursor-help">ⓘ</span>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the investment you'd own after redeeming your exchange fund shares. Expense ratio of VOO is 0.03%.</div>
+                                        <span class="text-emerald-400 cursor-help">ⓘ</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the investment you'd own after redeeming your exchange fund shares. Expense ratio of VOO is 0.03%.</div>
                                     </div>
                                 </div>
-                                <input type="range" id="postFundER" min="0" max="1" step="0.01" value="0.03" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="postFundERValue" class="block text-right font-semibold text-teal-600">0.03%</span>
+                                <input type="range" id="postFundER" min="0" max="1" step="0.01" value="0.03" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                <span id="postFundERValue" class="block text-right font-semibold text-emerald-400">0.03%</span>
                             </div>
                          </div>
                     </div>
@@ -237,123 +247,130 @@
                     <p id="winningScenarioText" class="text-2xl font-black h-8"></p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div id="sellReinvestBox" class="bg-white p-4 rounded-2xl shadow-lg border-2 border-gray-200 text-center flex flex-col justify-between transition-all duration-300">
+                    <div id="sellReinvestBox" class="bg-gray-800 p-4 rounded-2xl shadow-lg border-2 border-gray-700 text-center flex flex-col justify-between transition-all duration-300">
                         <h3 class="text-2xl font-bold text-[#ff8000] mb-2">Sell & Reinvest</h3>
                         <div>
                             <p id="finalValueA" class="text-2xl md:text-3xl font-bold text-[#ff8000]">$0</p>
-                            <p class="text-xs text-gray-500">Final Real After-Tax</p>
+                            <p class="text-xs text-gray-400">Final Real After-Tax</p>
                         </div>
-                        <div class="mt-2 pt-2 border-t border-gray-100">
-                            <p id="nominalValueA" class="text-lg md:text-xl font-semibold text-gray-600">$0</p>
+                        <div class="mt-2 pt-2 border-t border-gray-700">
+                            <p id="nominalValueA" class="text-lg md:text-xl font-semibold text-gray-400">$0</p>
                             <p class="text-xs text-gray-500">Nominal Pre-Tax</p>
                         </div>
                     </div>
-                     <div id="exchangeFundBox" class="bg-white p-4 rounded-2xl shadow-lg border-2 border-gray-200 text-center flex flex-col justify-between transition-all duration-300">
-                        <h3 class="text-2xl font-bold text-[#327ba8] mb-2">Exchange Fund</h3>
+                     <div id="exchangeFundBox" class="bg-gray-800 p-4 rounded-2xl shadow-lg border-2 border-gray-700 text-center flex flex-col justify-between transition-all duration-300">
+                        <h3 class="text-2xl font-bold text-[#2EA5FF] mb-2">Exchange Fund</h3>
                         <div>
-                            <p id="finalValueB" class="text-xl md:text-2xl font-bold text-[#327ba8]">$0</p>
-                            <p class="text-xs text-gray-500">Final Real After-Tax</p>
+                            <p id="finalValueB" class="text-xl md:text-2xl font-bold text-[#2EA5FF]">$0</p>
+                            <p class="text-xs text-gray-400">Final Real After-Tax</p>
                         </div>
-                        <div class="mt-2 pt-2 border-t border-gray-100">
-                            <p id="nominalValueB" class="text-lg md:text-xl font-semibold text-gray-600">$0</p>
+                        <div class="mt-2 pt-2 border-t border-gray-700">
+                            <p id="nominalValueB" class="text-lg md:text-xl font-semibold text-gray-400">$0</p>
                             <p class="text-xs text-gray-500">Nominal Pre-Tax</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
                     <div class="flex justify-between items-center mb-4">
-                         <h3 class="text-xl font-bold text-center">Value Over Time Comparison</h3>
+                         <h3 class="text-xl font-bold text-white text-center">Value Over Time Comparison</h3>
                         <div class="flex items-center">
-                             <span class="text-sm font-medium text-gray-600 mr-2">Real After-Tax</span>
+                             <span class="text-sm font-medium text-gray-300 mr-2">Real After-Tax</span>
                              <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                 <input type="checkbox" name="toggle" id="taxToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                <label for="taxToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                <label for="taxToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer"></label>
                             </div>
-                            <span class="text-sm font-medium text-gray-600">Nominal Pre-Tax</span>
+                            <span class="text-sm font-medium text-gray-300">Nominal Pre-Tax</span>
                         </div>
                     </div>
                     <div class="chart-container mx-auto">
                         <canvas id="valueOverTimeChart"></canvas>
                     </div>
                     <div class="text-center mt-4">
-                        <button id="exportCsvBtn" class="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-[#003f4f] transition-colors">Export Chart Data as CSV</button>
+                        <button id="exportCsvBtn" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">Export Chart Data as CSV</button>
                     </div>
                 </div>
 
-                <div class="p-6 flex items-center">
-                    <div class="w-1/3 text-center pr-4 border-r border-gray-200">
-                        <h3 class="text-2xl font-bold text-teal-800 mb-2">Break-Even<br>Expense Ratio</h3>
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex items-center">
+                    <div class="w-1/3 text-center pr-4 border-r border-gray-700">
+                        <h3 class="text-2xl font-bold text-white mb-2">Break-Even<br>Expense Ratio</h3>
                         <p id="breakEvenER" class="text-5xl font-extrabold text-[#e8136c]">0.75%</p>
                     </div>
                     <div class="w-2/3 pl-6">
 
-                    <p class="text-base text-grey-700">This is the maximum annual fee an exchange fund can charge and still give you a better outcome than selling your stock now.</p>
+                    <p class="text-base text-gray-400">This is the maximum annual fee an exchange fund can charge and still give you a better outcome than selling your stock now.</p>
                     <br>
-                    <p class="text-base text-grey-700">If your exchange fund's expense ratio is <span class="font-bold">lower</span>, then it's better to use the <span class="font-bold text-[#327ba8]">exchange fund</span>. If it's <span class="font-bold">higher</span>, then <span class="font-bold text-[#ff8000]">sell & reinvest</span> is the better choice.</p>
+                    <p class="text-base text-gray-400">If your exchange fund's expense ratio is <span class="font-bold">lower</span>, then it's better to use the <span class="font-bold text-[#2EA5FF]">exchange fund</span>. If it's <span class="font-bold">higher</span>, then <span class="font-bold text-[#ff8000]">sell & reinvest</span> is the better choice.</p>
 
                     </div>
                 </div>
 
-                <div class="card">
-                     <h3 class="text-xl font-bold mb-4 text-center">Break-Even Expense Ratio vs. Time Horizon</h3>
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                    <h3 class="text-xl font-bold mb-4 text-center text-white">Break-Even Expense Ratio vs. Time Horizon</h3>
                     <div class="chart-container mx-auto">
                         <canvas id="sensitivityChart"></canvas>
                     </div>
                     <div class="text-center mt-4">
-                        <button id="exportSensitivityCsvBtn" class="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-[#003f4f] transition-colors">Export Chart Data as CSV</button>
+                        <button id="exportSensitivityCsvBtn" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">Export Chart Data as CSV</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lg:col-span-3 mt-12 pt-8 border-t border-gray-700">
+                <h2 class="text-2xl font-bold text-center mb-6 text-white">Learn More</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <h4 class="font-bold text-emerald-400 mb-2">Understanding Concentrated Stock Risk</h4>
+                        <p class="text-gray-400">Why holding a large position in a single stock can be riskier than you think.</p>
+                        <a href="https://kaching-labs.com/concentrated_wealth/understanding_concentrated_stock_risk.html" class="block text-emerald-400 hover:text-emerald-300 transition-colors mt-2">
+                            Read More &rarr;
+                        </a>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <h4 class="font-bold text-emerald-400 mb-2">Intro To Exchange Funds</h4>
+                        <p class="text-gray-400">How these specialized funds work and who they are best suited for.</p>
+                        <a href="https://kaching-labs.com/concentrated_wealth/intro_to_exchange_funds.html" class="block text-emerald-400 hover:text-emerald-300 transition-colors mt-2">
+                            Read More &rarr;
+                        </a>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <h4 class="font-bold text-emerald-400 mb-2">Lock-Up Period</h4>
+                        <p class="text-gray-400">Exchange funds typically require you to keep your money in the fund for a minimum period, often seven years, to achieve the tax deferral. This reduces your liquidity.</p>
+                    </div>
+                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <h4 class="font-bold text-emerald-400 mb-2">Fund Quality & Returns</h4>
+                        <p class="text-gray-400">This analysis depends heavily on your return assumptions for both scenarios. You must be confident that the portfolios can achieve the returns you have modeled.</p>
+                    </div>
+                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <h4 class="font-bold text-emerald-400 mb-2">Estate Planning</h4>
+                        <p class="text-gray-400">If you hold the exchange fund position until death, your heirs may receive a step-up in basis on its value, potentially eliminating the deferred capital gains tax entirely. This can be a powerful advantage.</p>
+                    </div>
+                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <h4 class="font-bold text-emerald-400 mb-2">Taxes</h4>
+                        <p class="text-gray-400">A high tax rate makes tax deferral significantly more valuable and raises the break-even expense ratio. Ensure your tax rate input reflects federal, state, and any other capital gains taxes.</p>
                     </div>
                 </div>
             </section>
         </main>
 
-
-
-        <footer class="mt-12 pt-8 border-t border-gray-200">
-            <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">Learn More</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
-                <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-teal-700 mb-2">Understanding Concentrated Stock Risk</h4>
-                    <p class="text-gray-600">Why holding a large position in a single stock can be riskier than you think.</p>
-                    <a href="concentrated_wealth/intro_to_exchange_funds.html" class="block text-emerald-400 hover:text-emerald-300 transition-colors">
-                        Read More &rarr;
-                    </a>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-teal-700 mb-2">Intro To Exchange Funds</h4>
-                    <p class="text-gray-600">How these specialized funds work and who they are best suited for.</p>
-                    <a href="concentrated_wealth/intro_to_exchange_funds.html" class="block text-emerald-400 hover:text-emerald-300 transition-colors">
-                        Read More &rarr;
-                    </a>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-teal-700 mb-2">Lock-Up Period</h4>
-                    <p class="text-gray-600">Exchange funds typically require you to keep your money in the fund for a minimum period, often seven years, to achieve the tax deferral. This reduces your liquidity.</p>
-                </div>
-                 <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-teal-700 mb-2">Fund Quality & Returns</h4>
-                    <p class="text-gray-600">This analysis depends heavily on your return assumptions for both scenarios. You must be confident that the portfolios can achieve the returns you have modeled.</p>
-                </div>
-                 <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-teal-700 mb-2">Estate Planning</h4>
-                    <p class="text-gray-600">If you hold the exchange fund position until death, your heirs may receive a step-up in basis on its value, potentially eliminating the deferred capital gains tax entirely. This can be a powerful advantage.</p>
-                </div>
-                 <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-teal-700 mb-2">Taxes</h4>
-                    <p class="text-gray-600">A high tax rate makes tax deferral significantly more valuable and raises the break-even expense ratio. Ensure your tax rate input reflects federal, state, and any other capital gains taxes.</p>
-                </div>
-            </div>
-
-            <p class="text-center text-xs text-gray-500 mt-8">This tool is for informational purposes only and does not constitute financial advice. Consult with a qualified financial advisor and tax professional.</p>
-            <p id="copyright" class="text-center text-xs text-gray-400 mt-4"></p>
-        </footer>
+        <p class="text-center text-xs text-gray-500 mt-12">This tool is for informational purposes only and does not constitute financial advice. Consult with a qualified financial advisor and tax professional.</p>
 
     </div>
 
+    <footer class="bg-gray-800 border-t border-gray-700">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-400">
+            <p class="text-lg font-semibold text-white">KaChing <span class="text-emerald-400">Labs</span></p>
+            <p class="mt-2 text-sm">Intelligent tools for your financial journey.</p>
+            <p id="copyright" class="mt-4 text-xs text-gray-400"></p>
+        </div>
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Set Chart.js defaults for dark theme
+            Chart.defaults.color = '#9CA3AF'; // text-gray-400
+            Chart.defaults.borderColor = '#4B5563'; // border-gray-600
+
             let chartDataForExport = [];
             let sensitivityDataForExport = [];
 
@@ -423,9 +440,8 @@
 
             function updateSensitivityChart(data) {
                 if (!sensitivityChart) return;
-                // Update both datasets with the same data for the split-color effect
-                sensitivityChart.data.datasets[0].data = data; // Dataset for the 'above' fill
-                sensitivityChart.data.datasets[1].data = data; // Dataset for the line and 'below' fill
+                sensitivityChart.data.datasets[0].data = data;
+                sensitivityChart.data.datasets[1].data = data;
                 sensitivityChart.update();
             }
 
@@ -456,7 +472,6 @@
                 const N = parseInt(inputs.timeHorizon.value, 10);
                 const exchangeFundPeriod = parseInt(inputs.exchangeFundPeriod.value, 10);
 
-                // Validation Check
                 const isError = exchangeFundPeriod > N;
                 exchangeFundPeriodLabel.classList.toggle('text-red-600', isError);
                 exchangeFundPeriodValueDisplay.classList.toggle('text-red-600', isError);
@@ -618,20 +633,20 @@
                 exchangeFundBox.className = baseClasses.join(' ');
 
                 if (Math.abs(finalValueA - finalValueB) < 1) { // Tie condition
-                    sellReinvestBox.classList.add('bg-white', 'border-2', 'border-gray-200');
-                    exchangeFundBox.classList.add('bg-white', 'border-2', 'border-gray-200');
+                    sellReinvestBox.classList.add('bg-gray-800', 'border-2', 'border-gray-700');
+                    exchangeFundBox.classList.add('bg-gray-800', 'border-2', 'border-gray-700');
                     displays.winningScenarioText.textContent = "Scenarios are effectively equal.";
-                    displays.winningScenarioText.className = 'text-2xl font-black text-gray-600 h-8';
+                    displays.winningScenarioText.className = 'text-2xl font-black text-gray-400 h-8';
                 } else if (finalValueA > finalValueB) {
-                    sellReinvestBox.classList.add('bg-green-50', 'border-2', 'border-green-400', 'shadow-2xl', 'transform', 'scale-105');
-                    exchangeFundBox.classList.add('bg-white', 'border-2', 'border-gray-200', 'opacity-75');
+                    sellReinvestBox.classList.add('bg-emerald-900/30', 'border-2', 'border-emerald-500', 'shadow-2xl', 'transform', 'scale-105');
+                    exchangeFundBox.classList.add('bg-gray-800', 'border-2', 'border-gray-700', 'opacity-75');
                     displays.winningScenarioText.textContent = "Winning Scenario: Sell & Reinvest";
-                    displays.winningScenarioText.className = 'text-2xl font-black text-green-600 h-8';
+                    displays.winningScenarioText.className = 'text-2xl font-black text-emerald-400 h-8';
                 } else {
-                    exchangeFundBox.classList.add('bg-green-50', 'border-2', 'border-green-400', 'shadow-2xl', 'transform', 'scale-105');
-                    sellReinvestBox.classList.add('bg-white', 'border-2', 'border-gray-200', 'opacity-75');
+                    exchangeFundBox.classList.add('bg-emerald-900/30', 'border-2', 'border-emerald-500', 'shadow-2xl', 'transform', 'scale-105');
+                    sellReinvestBox.classList.add('bg-gray-800', 'border-2', 'border-gray-700', 'opacity-75');
                     displays.winningScenarioText.textContent = "Winning Scenario: Exchange Fund";
-                    displays.winningScenarioText.className = 'text-2xl font-black text-green-600 h-8';
+                    displays.winningScenarioText.className = 'text-2xl font-black text-emerald-400 h-8';
                 }
             }
 
@@ -645,14 +660,14 @@
                             label: 'Sell & Reinvest',
                             data: [],
                             borderColor: '#ff8000',
-                            backgroundColor: 'rgba(238, 155, 0, 0.1)',
+                            backgroundColor: '#ff8000',
                             fill: false,
                             tension: 0.1
                         }, {
                             label: 'Exchange Fund',
                             data: [],
-                            borderColor: '#327ba8',
-                            backgroundColor: 'rgba(50, 123, 168, 0.1)',
+                            borderColor: '#2EA5FF',
+                            backgroundColor: '#2EA5FF',
                             fill: false,
                             tension: 0.1
                         }]
@@ -661,7 +676,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'top' },
+                            legend: { position: 'top', labels: { color: '#D1D5DB' } },
                             tooltip: {
                                 mode: 'index',
                                 intersect: false,
@@ -674,9 +689,7 @@
                                     },
                                     label: function(context) {
                                         let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
+                                        if (label) { label += ': '; }
                                         if (context.parsed.y !== null) {
                                             label += currencyFormatter.format(context.parsed.y);
                                         }
@@ -687,17 +700,13 @@
                         },
                         scales: {
                              x: {
-                                title: {
-                                    display: true,
-                                    text: 'Year'
-                                }
+                                title: { display: true, text: 'Year' },
+                                ticks: { color: '#9CA3AF' }
                             },
                             y: {
-                                title: {
-                                    display: true,
-                                    text: 'Real After-Tax Value'
-                                },
+                                title: { display: true, text: 'Real After-Tax Value' },
                                 ticks: {
+                                    color: '#9CA3AF',
                                     callback: function(value) {
                                         if (value >= 1e9) return currencyFormatter.format(value / 1e9) + 'B';
                                         if (value >= 1e6) return currencyFormatter.format(value / 1e6) + 'M';
@@ -715,22 +724,24 @@
                     type: 'line',
                     data: {
                         datasets: [{
-                            // This dataset draws the orange fill ABOVE the line
                             label: 'Area Above',
                             data: [],
                             borderColor: 'transparent',
-                            backgroundColor: 'rgba(238, 155, 0, 0.3)',
-                            fill: 'end', // Fill to the top of the chart
+                            backgroundColor: 'rgba(238, 155, 0, 0.6)',
+                            fill: 'end',
                             tension: 0.4,
                             pointRadius: 0,
                         }, {
-                            // This dataset draws the pink line and the blue fill BELOW it
                             label: 'Break-Even Expense Ratio',
                             data: [],
                             borderColor: '#e8136c',
-                            backgroundColor: 'rgba(50, 123, 168, 0.3)',
-                            fill: 'start', // Fill to the bottom of the chart
+                            backgroundColor: 'rgba(46, 165, 255, 0.6)',
+                            fill: 'start',
                             tension: 0.4,
+                            // --- LINES ADDED TO MAKE DATA POINTS SOLID PINK ---
+                            pointBackgroundColor: '#e8136c',
+                            pointBorderColor: '#e8136c',
+                            // ----------------------------------------------
                         }]
                     },
                     options: {
@@ -741,19 +752,20 @@
                             tooltip: {
                                 mode: 'index',
                                 intersect: false,
-                                // Only show tooltips for the dataset with the visible line
-                                filter: function(tooltipItem) {
-                                    return tooltipItem.datasetIndex === 1;
-                                },
+                                filter: function(tooltipItem) { return tooltipItem.datasetIndex === 1; },
                                 callbacks: {
                                      title: function(tooltipItems) {
-                                        if (tooltipItems.length > 0) {
-                                            return `Year ${tooltipItems[0].raw.x}`;
-                                        }
+                                        if (tooltipItems.length > 0) { return `Year ${tooltipItems[0].raw.x}`; }
                                         return '';
                                     },
                                     label: function(context) {
                                         return `Break-even Expense Ratio: ${context.raw.y.toFixed(2)}%`;
+                                    },
+                                    labelColor: function(context) {
+                                        return {
+                                            borderColor: '#e8136c',
+                                            backgroundColor: '#e8136c'
+                                        };
                                     }
                                 }
                             }
@@ -761,23 +773,20 @@
                         scales: {
                             x: {
                                 type: 'linear',
-                                title: {
-                                    display: true,
-                                    text: 'Investment Time Horizon (Years)'
-                                },
-                                min: 1 // This sets the axis to start at 1
+                                title: { display: true, text: 'Investment Time Horizon (Years)' },
+                                min: 1,
+                                ticks: { color: '#9CA3AF' }
                             },
                             y: {
-                                title: {
-                                    display: true,
-                                    text: 'Break-Even Expense Ratio (%)'
-                                },
+                                title: { display: true, text: 'Break-Even Expense Ratio (%)' },
                                 beginAtZero: false,
+                                ticks: { color: '#9CA3AF' }
                             }
                         }
                     }
                 });
             }
+
 
             function exportToCsv(data, filename) {
                 let csvContent = "data:text/csv;charset=utf-8,";
@@ -802,7 +811,6 @@
                     });
                 }
 
-
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
@@ -813,25 +821,17 @@
             }
 
             function setupEventListeners() {
-                // Number formatting listeners
                 [inputs.currentValue, inputs.costBasis].forEach(input => {
                     input.addEventListener('focus', (e) => {
-                        if (e.target.value) {
-                            e.target.value = e.target.value.replace(/,/g, '');
-                        }
+                        if (e.target.value) { e.target.value = e.target.value.replace(/,/g, ''); }
                     });
                     input.addEventListener('blur', (e) => {
                         const value = parseFloat(e.target.value);
-                        if (!isNaN(value)) {
-                            e.target.value = numberFormatter.format(value);
-                        } else {
-                            e.target.value = '';
-                        }
-                        calculate(); // Recalculate on blur after formatting
+                        if (!isNaN(value)) { e.target.value = numberFormatter.format(value); } else { e.target.value = ''; }
+                        calculate();
                     });
                 });
 
-                // Main calculation listeners
                 Object.values(inputs).forEach(input => {
                      if (input.type !== 'text' && !input.id.includes('CsvBtn')) {
                         input.addEventListener('input', () => {
@@ -843,7 +843,7 @@
 
                 inputs.exportCsvBtn.addEventListener('click', () => exportToCsv(chartDataForExport, 'Scenario_Comparison.csv'));
                 inputs.exportSensitivityCsvBtn.addEventListener('click', () => exportToCsv(sensitivityDataForExport, 'Break_Even_Expense_Ratio_VS_Time_Horizon.csv'));
-                displays.copyright.innerHTML = `© ${new Date().getFullYear()} <a href="https://kaching-labs.com" class="text-teal-600 hover:underline">KaChing Labs</a>. All Rights Reserved.`;
+                displays.copyright.innerHTML = `© ${new Date().getFullYear()} <a href="ref.html" class="text-emerald-400 hover:text-emerald-300 transition-colors">KaChing Labs</a>. All Rights Reserved.`;
             }
 
             createCharts();
