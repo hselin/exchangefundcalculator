@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -28,6 +30,9 @@
             .chart-container {
                 height: 350px;
             }
+        }
+        input[type=range] {
+            touch-action: pan-y; /* Prevents accidental horizontal page scroll on mobile */
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -233,7 +238,10 @@
                                         </div>
                                     </div>
                                     <input type="range" id="exchangeFundER" min="0" max="3" step="0.01" value="1.25" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="exchangeFundERValue" class="block text-right font-semibold text-emerald-400">1.25%</span>
+                                    <div class="flex justify-end items-center mt-1">
+                                        <span id="exchangeFundERValue" class="block font-semibold text-emerald-400">1.25%</span>
+                                        <span id="breakEvenIndicator" class="text-xs font-bold px-2 py-1 rounded-md ml-2"></span>
+                                    </div>
                                 </div>
                                 <div>
                                      <div class="flex justify-between items-center">
@@ -253,8 +261,8 @@
 
                 <!-- Right Panel: Results & Charts -->
                 <section class="lg:col-span-2 space-y-8">
-                     <div class="text-center my-4">
-                        <p id="winningScenarioText" class="text-2xl md:text-3xl font-black mb-4"></p>
+                     <div id="result-container" class="mb-4">
+                        <!-- Result Banner will be injected here by JavaScript -->
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div id="sellReinvestBox" class="bg-gray-900 p-4 rounded-2xl shadow-lg border-2 border-gray-700 text-center flex flex-col justify-between transition-all duration-300">
@@ -298,7 +306,7 @@
                         </div>
                         <div class="text-center mt-4">
                             <button id="exportCsvBtn" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                <i class="fas fa-download mr-2"></i>
                                 <span>Export Chart Data as CSV</span>
                             </button>
                         </div>
@@ -307,12 +315,12 @@
                     <div class="bg-gray-900 p-6 rounded-2xl border border-gray-700 flex flex-col md:flex-row items-center">
                         <div class="w-full md:w-1/3 text-center mb-4 md:mb-0 md:pr-4 md:border-r md:border-gray-700">
                             <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Break-Even<br>Expense Ratio</h3>
-                            <p id="breakEvenER" class="text-4xl md:text-5xl font-extrabold text-emerald-400">0.75%</p>
+                            <p id="breakEvenER" class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-emerald-400">0.75%</p>
                         </div>
                         <div class="w-full md:w-2/3 md:pl-6">
-                            <p class="text-base text-gray-400">This is the maximum annual fee an exchange fund can charge and still give you a better outcome than selling your stock now.</p>
+                            <p class="text-sm md:text-base text-gray-400">This is the maximum annual fee an exchange fund can charge and still give you a better outcome than selling your stock now.</p>
                             <br>
-                            <p class="text-base text-gray-400">If your exchange fund's expense ratio is <span class="font-bold">lower</span>, then it's better to use the <span class="font-bold text-cyan-400">exchange fund</span>. If it's <span class="font-bold">higher</span>, then <span class="font-bold text-[#f6935f]">sell & reinvest</span> is the better choice.</p>
+                            <p class="text-sm md:text-base text-gray-400">If your exchange fund's expense ratio is <span class="font-bold">lower</span>, then it's better to use the <span class="font-bold text-cyan-400">exchange fund</span>. If it's <span class="font-bold">higher</span>, then <span class="font-bold text-[#f6935f]">sell & reinvest</span> is the better choice.</p>
                         </div>
                     </div>
 
@@ -323,7 +331,7 @@
                         </div>
                         <div class="text-center mt-4">
                             <button id="exportSensitivityCsvBtn" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                <i class="fas fa-download mr-2"></i>
                                 <span>Export Chart Data as CSV</span>
                             </button>
                         </div>
@@ -376,7 +384,11 @@
         <div class="container mx-auto px-6 py-8 text-center text-gray-400">
             <a href="https://KaChing-Labs.com" class="text-base md:text-lg font-semibold text-white">KaChing <span class="text-emerald-400">Labs</span></a>
             <p class="mt-2 text-sm">Intelligent tools for your financial journey.</p>
-            <p class="mt-4 text-xs">&copy; 2025 KaChing Labs. All Rights Reserved.</p>
+            <p class="mt-4 text-xs">
+                &copy; 2025 KaChing Labs. All Rights Reserved.
+                <span class="mx-2 text-gray-600">|</span>
+                <a href="https://kaching-labs.com/legal.html" class="hover:text-emerald-400 underline">Legal Information</a>
+            </p>
         </div>
     </footer>
 
@@ -435,7 +447,8 @@
                 finalValueB: document.getElementById('finalValueB'),
                 nominalValueB: document.getElementById('nominalValueB'),
                 breakEvenER: document.getElementById('breakEvenER'),
-                winningScenarioText: document.getElementById('winningScenarioText'),
+                resultContainer: document.getElementById('result-container'),
+                breakEvenIndicator: document.getElementById('breakEvenIndicator'),
             };
 
             const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -506,8 +519,11 @@
                 exchangeFundPeriodSlider.classList.toggle('slider-error', isError);
 
                 if (isError) {
-                    displays.winningScenarioText.textContent = "Error: Exchange Fund Period cannot exceed Total Investment Horizon.";
-                    displays.winningScenarioText.className = 'text-2xl md:text-3xl font-black text-red-500 mb-4';
+                    displays.resultContainer.innerHTML = `
+                        <div class="bg-red-900/30 border border-red-500 rounded-lg p-4 flex items-center justify-center gap-3">
+                            <i class="fas fa-triangle-exclamation text-3xl text-red-500"></i>
+                            <span class="text-xl md:text-2xl font-black text-red-400">Error: Exchange Fund Period cannot exceed Total Investment Horizon</span>
+                        </div>`;
                     displays.finalValueA.textContent = '–';
                     displays.nominalValueA.textContent = '–';
                     displays.finalValueB.textContent = '–';
@@ -517,7 +533,7 @@
                     if (sensitivityChart) updateSensitivityChart([]);
                     return;
                 } else {
-                     displays.winningScenarioText.textContent = '';
+                     displays.resultContainer.innerHTML = '';
                 }
 
                 const V = parseFloat(inputs.currentValue.value.replace(/,/g, '')) || 0;
@@ -534,19 +550,10 @@
 
                 const R_A_nominal_net = R_A_nominal - ER_low;
 
-                if (V <= B) {
-                    displays.breakEvenER.textContent = "N/A";
-                    displays.finalValueA.textContent = currencyFormatter.format(V);
-                    displays.nominalValueA.textContent = currencyFormatter.format(V);
-                    displays.finalValueB.textContent = currencyFormatter.format(V);
-                    displays.nominalValueB.textContent = currencyFormatter.format(V);
-                    displays.winningScenarioText.textContent = "Scenarios are equal.";
-                    updateValueOverTimeChart([0], [V], [V], showPreTax);
-                    updateSensitivityChart([]);
-                    return;
-                }
-
-                const G = V - B;
+                // This is the initial gain (if V > B) or 0.
+                const initialGain = Math.max(0, V - B);
+                // This is the initial loss (if B > V) or 0. This is the carryforward amount.
+                const capitalLossCarryforward = Math.max(0, B - V);
 
                 const getNominalFutureValueB = (er_x, years) => {
                     const R_B_high_ER_net = R_B_nominal - er_x;
@@ -563,24 +570,35 @@
                 };
 
                 const calcScenarioA = (years) => {
-                    const principalA = V - (G * T);
+                    // Principal is the after-tax proceeds from the initial sale.
+                    const principalA = V - (initialGain * T);
                     const nominalFutureValue = principalA * Math.pow(1 + R_A_nominal_net, years);
-                    const nominalGain = nominalFutureValue - principalA;
-                    const futureTax = nominalGain * T;
+
+                    // Gain from the new investment.
+                    const reinvestmentGain = nominalFutureValue - principalA;
+
+                    // The loss carryforward offsets the new gain.
+                    const netTaxableGain = Math.max(0, reinvestmentGain - capitalLossCarryforward);
+
+                    const futureTax = netTaxableGain * T;
+
                     const nominalAfterTaxValue = nominalFutureValue - futureTax;
+
                     return nominalAfterTaxValue / Math.pow(1 + I, years);
                 };
 
                 const calcScenarioB = (er_x, years) => {
                     const nominalFutureValue = getNominalFutureValueB(er_x, years);
+                    // The gain is calculated against the original high cost basis.
                     const nominalGain = nominalFutureValue - B;
-                    const futureTax = nominalGain * T;
+                    // Tax is only applied to positive gains.
+                    const futureTax = Math.max(0, nominalGain) * T;
                     const nominalAfterTaxValue = nominalFutureValue - futureTax;
                     return nominalAfterTaxValue / Math.pow(1 + I, years);
                 };
 
                 const calcScenarioA_preTax = (years) => {
-                     const principalA = V - (G * T);
+                     const principalA = V - (initialGain * T);
                     return principalA * Math.pow(1 + R_A_nominal_net, years);
                 };
 
@@ -616,6 +634,21 @@
                 const breakEvenERPercentage = breakEvenER * 100;
                 const roundedDownER = Math.floor(breakEvenERPercentage * 100) / 100;
                 displays.breakEvenER.textContent = (exchangeFundPeriod > 0 && N > 0) ? `${roundedDownER.toFixed(2)}%` : 'N/A';
+
+                // Update Break-Even Indicator
+                if (breakEvenER > 0) {
+                    if (userSetER * 100 < roundedDownER) {
+                        displays.breakEvenIndicator.textContent = 'Good';
+                        displays.breakEvenIndicator.className = 'text-xs font-bold px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-400 ml-2';
+                    } else {
+                        displays.breakEvenIndicator.textContent = 'High';
+                        displays.breakEvenIndicator.className = 'text-xs font-bold px-2 py-1 rounded-md bg-amber-500/20 text-amber-400 ml-2';
+                    }
+                } else {
+                    displays.breakEvenIndicator.textContent = '';
+                    displays.breakEvenIndicator.className = '';
+                }
+
 
                 const labels = Array.from({ length: N + 1 }, (_, i) => i);
                 const valueDataA = labels.map(year => calcScenarioA(year));
@@ -657,28 +690,49 @@
                 const exchangeFundBox = document.getElementById('exchangeFundBox');
 
                 const baseClasses = ['p-4', 'rounded-2xl', 'text-center', 'flex', 'flex-col', 'justify-between', 'transition-all', 'duration-300', 'bg-gray-900', 'border-2'];
-                const winnerClasses = ['bg-emerald-900/30', 'border-emerald-500', 'shadow-2xl', 'transform', 'scale-105'];
+                const winnerClassesA = ['bg-[#f6935f]/10', 'border-[#f6935f]', 'shadow-2xl'];
+                const winnerClassesB = ['bg-cyan-400/10', 'border-cyan-400', 'shadow-2xl'];
                 const loserClasses = ['border-gray-700', 'opacity-75'];
 
                 sellReinvestBox.className = baseClasses.join(' ');
                 exchangeFundBox.className = baseClasses.join(' ');
 
+                let resultHTML = '';
                 if (Math.abs(finalValueA - finalValueB) < 1) { // Tie condition
                     sellReinvestBox.classList.add('border-gray-700');
                     exchangeFundBox.classList.add('border-gray-700');
-                    displays.winningScenarioText.textContent = "Scenarios are effectively equal.";
-                    displays.winningScenarioText.className = 'text-2xl md:text-3xl font-black text-gray-400 mb-4';
+                    resultHTML = `
+                        <div class="bg-gray-700/50 border border-gray-500 rounded-lg p-4 flex items-center justify-center gap-3">
+                            <span class="fa-stack fa-1x">
+                                <i class="fas fa-circle fa-stack-2x text-gray-600"></i>
+                                <i class="fas fa-equals fa-stack-1x fa-inverse text-gray-300"></i>
+                            </span>
+                            <span class="text-2xl md:text-3xl font-black text-white">Outcomes are effectively the same</span>
+                        </div>`;
                 } else if (finalValueA > finalValueB) {
-                    sellReinvestBox.classList.add(...winnerClasses);
+                    sellReinvestBox.classList.add(...winnerClassesA);
                     exchangeFundBox.classList.add(...loserClasses);
-                    displays.winningScenarioText.textContent = "Winning Scenario: Sell & Reinvest";
-                    displays.winningScenarioText.className = 'text-2xl md:text-3xl font-black text-emerald-400 mb-4';
+                    resultHTML = `
+                        <div class="bg-[#f6935f]/10 border border-[#f6935f] rounded-lg p-4 flex items-center justify-center gap-3">
+                            <span class="fa-stack fa-1x">
+                                <i class="fas fa-circle fa-stack-2x text-[#f6935f]/80"></i>
+                                <i class="fas fa-seedling fa-stack-1x fa-inverse text-gray-900"></i>
+                            </span>
+                            <span class="text-2xl md:text-3xl font-black text-[#f6935f]">Sell & Reinvest is Better</span>
+                        </div>`;
                 } else {
-                    exchangeFundBox.classList.add(...winnerClasses);
+                    exchangeFundBox.classList.add(...winnerClassesB);
                     sellReinvestBox.classList.add(...loserClasses);
-                    displays.winningScenarioText.textContent = "Winning Scenario: Exchange Fund";
-                    displays.winningScenarioText.className = 'text-2xl md:text-3xl font-black text-emerald-400 mb-4';
+                    resultHTML = `
+                        <div class="bg-cyan-400/10 border border-cyan-400 rounded-lg p-4 flex items-center justify-center gap-3">
+                           <span class="fa-stack fa-1x">
+                                <i class="fas fa-circle fa-stack-2x text-cyan-400/80"></i>
+                                <i class="fas fa-rotate fa-stack-1x fa-inverse text-gray-900"></i>
+                            </span>
+                            <span class="text-2xl md:text-3xl font-black text-cyan-400">Exchange Fund is Better</span>
+                        </div>`;
                 }
+                displays.resultContainer.innerHTML = resultHTML;
             }
 
             function createCharts() {
@@ -757,6 +811,30 @@
                         const ctx = chart.ctx;
                         const chartArea = chart.chartArea;
 
+                        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+                            const words = text.split(' ');
+                            let line = '';
+                            let testLine;
+                            let lineArray = [];
+
+                            for(let n = 0; n < words.length; n++) {
+                                testLine = line + words[n] + ' ';
+                                const metrics = context.measureText(testLine);
+                                const testWidth = metrics.width;
+                                if (testWidth > maxWidth && n > 0) {
+                                    lineArray.push(line);
+                                    line = words[n] + ' ';
+                                } else {
+                                    line = testLine;
+                                }
+                            }
+                            lineArray.push(line);
+
+                            for(let k = 0; k < lineArray.length; k++) {
+                                context.fillText(lineArray[k], x, y + (k * lineHeight));
+                            }
+                        }
+
                         ctx.save();
 
                         // Calculate a dynamic font size based on chart width
@@ -769,15 +847,19 @@
                         // Define text properties
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
 
-                        // "Sell & Reinvest is Better" text (Top Left)
+                        const textTop = 'Sell & Reinvest is Better';
+                        const textBottom = 'Exchange Fund is Better';
+                        const padding = 20;
+                        const maxWidth = chartArea.width - (padding * 2);
+                        const lineHeight = fontSize * 1.2;
+
                         ctx.textAlign = 'left';
                         ctx.textBaseline = 'top';
-                        ctx.fillText('Sell & Reinvest is Better', chartArea.left + 20, chartArea.top + 20);
+                        wrapText(ctx, textTop, chartArea.left + padding, chartArea.top + padding, maxWidth, lineHeight);
 
-                        // "Exchange Fund is Better" text (Bottom Right)
                         ctx.textAlign = 'right';
                         ctx.textBaseline = 'bottom';
-                        ctx.fillText('Exchange Fund is Better', chartArea.right - 20, chartArea.bottom - 20);
+                        wrapText(ctx, textBottom, chartArea.right - padding, chartArea.bottom - padding, maxWidth, lineHeight);
 
                         ctx.restore();
                     }
