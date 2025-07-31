@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exchange Fund Calculator | Sell or Exchange?</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Charting Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -67,6 +70,19 @@
         input[type=range].slider-error::-moz-range-thumb {
              background: #ef4444; /* red-500 for error state */
         }
+        .tooltip {
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .tooltip-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* More targeted fix for horizontal scroll */
+        .container {
+            overflow-x: hidden;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-300">
@@ -102,31 +118,31 @@
                                         <label for="currentValue" class="block text-xs md:text-sm font-medium text-gray-300">Current Market Value ($)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The current market price of your concentrated stock position.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-60 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The current market price of your concentrated stock position.</div>
                                         </div>
                                     </div>
-                                    <input type="text" id="currentValue" value="1,000,000" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg px-2 py-1 border border-gray-600">
+                                    <input type="text" id="currentValue" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg px-2 py-1 border border-gray-600">
                                 </div>
                                 <div>
                                      <div class="flex justify-between items-center">
                                         <label for="costBasis" class="block text-xs md:text-sm font-medium text-gray-300">Cost Basis ($)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">How much you paid for the concentrated stock position, including commissions.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">How much you paid for the concentrated stock position, including commissions.</div>
                                         </div>
                                     </div>
-                                    <input type="text" id="costBasis" value="200,000" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg px-2 py-1 border border-gray-600">
+                                    <input type="text" id="costBasis" inputmode="numeric" class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg px-2 py-1 border border-gray-600">
                                 </div>
                                 <div>
                                     <div class="flex justify-between items-center">
                                         <label for="taxRate" class="block text-xs md:text-sm font-medium text-gray-300">Tax Rate (%)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">Your combined federal and state tax rate.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">Your combined federal and state tax rate.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="taxRate" min="10" max="50" step="0.1" value="23.8" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="taxRateValue" class="block text-right font-semibold text-emerald-400">23.8%</span>
+                                    <input type="range" id="taxRate" min="10" max="50" step="0.1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="taxRateValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                             </div>
                         </div>
@@ -140,33 +156,33 @@
                                         <label for="scenarioAAnnualReturn" class="block text-xs md:text-sm font-medium text-gray-300">Sell & Reinvest Annual Return (%)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the investment you'd buy after selling your concentrated stock. The S&P 500 has averaged around 10% annually since 1957.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The expected annual growth rate of the investment you'd buy after selling your concentrated stock. The S&P 500 has averaged around 10% annually since 1957.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="scenarioAAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="scenarioAAnnualReturnValue" class="block text-right font-semibold text-emerald-400">10.0%</span>
+                                    <input type="range" id="scenarioAAnnualReturn" min="1" max="15" step="0.1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="scenarioAAnnualReturnValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                                 <div>
                                      <div class="flex justify-between items-center">
                                         <label for="exchangeFundAnnualReturn" class="block text-xs md:text-sm font-medium text-gray-300">Exchange Fund Annual Return (%)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the exchange fund before fees. The S&P 500 has averaged about 10% annually since 1957.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The expected annual growth rate of the exchange fund before fees. The S&P 500 has averaged about 10% annually since 1957.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="exchangeFundAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="exchangeFundAnnualReturnValue" class="block text-right font-semibold text-emerald-400">10.0%</span>
+                                    <input type="range" id="exchangeFundAnnualReturn" min="1" max="15" step="0.1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="exchangeFundAnnualReturnValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                                 <div>
                                     <div class="flex justify-between items-center">
                                         <label for="postFundAnnualReturn" class="block text-xs md:text-sm font-medium text-gray-300">Exchange Fund Post-Redemption Annual Return (%)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected annual growth rate of the investment you’d own after exiting the exchange fund. The S&P 500 has averaged about 10% annually since 1957.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The expected annual growth rate of the investment you’d own after exiting the exchange fund. The S&P 500 has averaged about 10% annually since 1957.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="postFundAnnualReturn" min="1" max="15" step="0.1" value="10.0" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="postFundAnnualReturnValue" class="block text-right font-semibold text-emerald-400">10.0%</span>
+                                    <input type="range" id="postFundAnnualReturn" min="1" max="15" step="0.1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="postFundAnnualReturnValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                             </div>
                         </div>
@@ -180,11 +196,11 @@
                                         <label for="inflation" class="block text-xs md:text-sm font-medium text-gray-300">Annual Inflation (%)</label>
                                          <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The expected average annual inflation rate over your investment horizon. This is used to calculate real, after-tax returns. Historically, U.S. inflation has averaged about 3.3% annually.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The expected average annual inflation rate over your investment horizon. This is used to calculate real, after-tax returns. Historically, U.S. inflation has averaged about 3.3% annually.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="inflation" min="0" max="10" step="0.1" value="3.3" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="inflationValue" class="block text-right font-semibold text-emerald-400">3.3%</span>
+                                    <input type="range" id="inflation" min="0" max="10" step="0.1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="inflationValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                             </div>
                         </div>
@@ -198,22 +214,22 @@
                                         <label for="timeHorizon" class="block text-xs md:text-sm font-medium text-gray-300">Total Investment Horizon (Years)</label>
                                          <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The number of years you expect to remain invested, whether using an exchange fund or selling & reinvesting.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The number of years you expect to remain invested, whether using an exchange fund or selling & reinvesting.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="timeHorizon" min="0" max="40" step="1" value="20" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="timeHorizonValue" class="block text-right font-semibold text-emerald-400">20 Years</span>
+                                    <input type="range" id="timeHorizon" min="0" max="40" step="1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="timeHorizonValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                                  <div id="exchangeFundPeriodContainer">
                                     <div class="flex justify-between items-center">
                                         <label for="exchangeFundPeriod" class="block text-xs md:text-sm font-medium text-gray-300">Exchange Fund Period (Years)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The number of years you plan to stay in the exchange fund before redeeming your shares (typically 7 years).</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The number of years you plan to stay in the exchange fund before redeeming your shares (typically 7 years).</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="exchangeFundPeriod" min="0" max="40" step="1" value="7" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="exchangeFundPeriodValue" class="block text-right font-semibold text-emerald-400">7 Years</span>
+                                    <input type="range" id="exchangeFundPeriod" min="0" max="40" step="1" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="exchangeFundPeriodValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                             </div>
                         </div>
@@ -227,23 +243,23 @@
                                         <label for="scenarioAER" class="block text-xs md:text-sm font-medium text-gray-300">Sell & Reinvest Expense Ratio (%)</label>
                                         <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the investment you would buy in the sell & reinvest scenario. Expense ratio of VOO is 0.03%.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The annual expense ratio of the investment you would buy in the sell & reinvest scenario. Expense ratio of VOO is 0.03%.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="scenarioAER" min="0" max="1" step="0.01" value="0.03" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="scenarioAERValue" class="block text-right font-semibold text-emerald-400">0.03%</span>
+                                    <input type="range" id="scenarioAER" min="0" max="1" step="0.01" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="scenarioAERValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                                 <div>
                                     <div class="flex justify-between items-center">
                                         <label for="exchangeFundER" class="block text-xs md:text-sm font-medium text-gray-300">Exchange Fund Expense Ratio (%)</label>
                                          <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the exchange fund you’re considering.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The annual expense ratio of the exchange fund you’re considering.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="exchangeFundER" min="0" max="3" step="0.01" value="1.25" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <input type="range" id="exchangeFundER" min="0" max="3" step="0.01" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
                                     <div class="flex justify-end items-center mt-1">
-                                        <span id="exchangeFundERValue" class="block font-semibold text-emerald-400">1.25%</span>
+                                        <span id="exchangeFundERValue" class="block font-semibold text-emerald-400"></span>
                                         <span id="breakEvenIndicator" class="text-xs font-bold px-2 py-1 rounded-md ml-2"></span>
                                     </div>
                                 </div>
@@ -252,11 +268,11 @@
                                         <label for="postFundER" class="block text-xs md:text-sm font-medium text-gray-300">Exchange Fund Post-Redemption ER (%)</label>
                                          <div class="relative group">
                                             <span class="text-emerald-400 cursor-help">ⓘ</span>
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">The annual expense ratio of the investment you'd own after redeeming your exchange fund shares. Expense ratio of VOO is 0.03%.</div>
+                                            <div class="tooltip absolute bottom-full mb-2 w-64 bg-gray-800 border border-gray-700 text-white text-xs rounded-lg p-2 z-10">The annual expense ratio of the investment you'd own after redeeming your exchange fund shares. Expense ratio of VOO is 0.03%.</div>
                                         </div>
                                     </div>
-                                    <input type="range" id="postFundER" min="0" max="1" step="0.01" value="0.03" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                                    <span id="postFundERValue" class="block text-right font-semibold text-emerald-400">0.03%</span>
+                                    <input type="range" id="postFundER" min="0" max="1" step="0.01" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                                    <span id="postFundERValue" class="block text-right font-semibold text-emerald-400"></span>
                                 </div>
                              </div>
                         </div>
@@ -279,6 +295,10 @@
                                 <p id="nominalValueA" class="text-lg md:text-xl font-semibold text-gray-400">$0</p>
                                 <p class="text-xs text-gray-500">Nominal Pre-Tax</p>
                             </div>
+                            <div class="mt-2 pt-2 border-t border-gray-700">
+                                <p id="taxesPaidA" class="text-lg md:text-xl font-semibold text-gray-400">$0</p>
+                                <p class="text-xs text-gray-500">Total Taxes Paid</p>
+                            </div>
                         </div>
                          <div id="exchangeFundBox" class="bg-gray-900 p-4 rounded-2xl shadow-lg border-2 border-gray-700 text-center flex flex-col justify-between transition-all duration-300">
                             <h3 class="text-xl md:text-2xl font-bold text-cyan-400 mb-2">Exchange Fund</h3>
@@ -290,6 +310,10 @@
                                 <p id="nominalValueB" class="text-lg md:text-xl font-semibold text-gray-400">$0</p>
                                 <p class="text-xs text-gray-500">Nominal Pre-Tax</p>
                             </div>
+                            <div class="mt-2 pt-2 border-t border-gray-700">
+                                <p id="taxesPaidB" class="text-lg md:text-xl font-semibold text-gray-400">$0</p>
+                                <p class="text-xs text-gray-500">Total Taxes Paid</p>
+                            </div>
                         </div>
                     </div>
 
@@ -297,12 +321,12 @@
                         <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 md:gap-0">
                              <h3 class="text-lg md:text-xl font-bold text-white">Value Over Time Comparison</h3>
                             <div class="flex items-center">
-                                 <span class="text-sm font-medium text-gray-300 mr-2">Real After-Tax</span>
+                                 <span class="text-sm font-medium text-gray-300 mr-2">Nominal Pre-Tax</span>
                                  <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                    <input type="checkbox" name="toggle" id="taxToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                    <input type="checkbox" name="toggle" id="taxToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
                                     <label for="taxToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer"></label>
                                 </div>
-                                <span class="text-sm font-medium text-gray-300">Nominal Pre-Tax</span>
+                                <span class="text-sm font-medium text-gray-300">Real After-Tax</span>
                             </div>
                         </div>
                         <div class="chart-container mx-auto">
@@ -340,8 +364,35 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- Tax Chart -->
+                    <div class="bg-gray-900 p-6 rounded-2xl border border-gray-700">
+                        <h3 class="text-lg md:text-xl font-bold mb-4 text-center text-white">Taxes Paid Over Time</h3>
+                        <div id="taxChart" class="chart-container mx-auto"></div>
+                        <p class="text-xs text-gray-500 text-center mt-2">This chart shows when taxes are paid in each scenario. For "Sell & Reinvest," tax is paid on the initial sale (Year 0) and again on gains at the end. For the "Exchange Fund," tax is deferred until the end of the investment horizon.</p>
+                        <div class="text-center mt-4">
+                            <button id="exportTaxesCsvBtn" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">
+                                <i class="fas fa-download mr-2"></i>
+                                <span>Export Chart Data as CSV</span>
+                            </button>
+                        </div>
+                    </div>
                 </section>
             </main>
+
+            <!-- Key Assumptions & Notes Section -->
+            <div class="mt-12">
+                <h3 class="text-lg md:text-xl font-bold mb-4 text-center text-white">Key Assumptions & Notes</h3>
+                <ul class="max-w-3xl mx-auto list-disc list-inside text-gray-400 space-y-2 text-sm">
+                    <li>Taxes are calculated based on the long-term capital gains rate provided. The model assumes all gains are long-term.</li>
+                    <li>For simplicity, taxes are paid at Year 0 (for the "Sell & Reinvest" scenario) and at the end of the total investment horizon.</li>
+                    <li>All returns are compounded annually, including investment returns and the effect of expense ratios.</li>
+                    <li>The model does not account for dividends or other distributions from investments.</li>
+                    <li>The "Tax Rate" input should be your combined federal, state, and local capital gains rate.</li>
+                    <li>This is a simplified financial model and does not account for all possible market conditions or tax law changes.</li>
+                </ul>
+            </div>
+
             <p class="text-center text-xs text-gray-500 mt-12">This tool is for informational purposes only and does not constitute financial advice. Consult with a qualified financial advisor and tax professional.</p>
         </div>
     </section>
@@ -398,25 +449,56 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Set Chart.js defaults for dark theme
-            Chart.defaults.color = '#9CA3AF'; // text-gray-400
-            Chart.defaults.borderColor = '#4B5563'; // border-gray-600
 
-            // --- COLOR PALETTE ---
-            const palette = {
+            // --- CENTRALIZED CONFIGURATION ---
+            const config = {
+                palette: {
                 scenarioA: '#f6935f',
+                    scenarioA_bg: 'rgba(246, 147, 95, 0.1)',
                 scenarioB: '#22D3EE', // cyan-400
-                scenarioA_value_over_time_chart_bg: 'rgba(246, 147, 95, 1)',
-                scenarioB_value_over_time_chart_bg: 'rgba(34, 211, 238, 1)',
+                    scenarioB_bg: 'rgba(34, 211, 238, 0.1)',
                 scenarioA_sensitivity_chart_bg: 'rgba(246, 147, 95, 0.7)',
                 scenarioB_sensitivity_chart_bg: 'rgba(34, 211, 238, 0.7)',
                 winner: '#34D399', // emerald-400
-                winner_bg: 'rgba(52, 211, 153, 1.0)',
+                    tie: {
+                        bg: '#374151',      // gray-700
+                        border: '#6B7280',  // gray-500
+                        icon_base: '#4B5563', // gray-600
+                        icon_symbol: '#D1D5DB', // gray-300
+                        text: '#FFFFFF'     // white
+                    },
+                    text: '#9CA3AF', // text-gray-400
+                    border: '#4B5563', // border-gray-600
+                    tooltipBg: '#1F2937', // bg-gray-800
+                    tooltipText: '#D1D5DB' // text-gray-300
+                },
+                initialInputs: {
+                    currentValue: '1,000,000',
+                    costBasis: '200,000',
+                    taxRate: 23.8,
+                    scenarioAAnnualReturn: 10.0,
+                    exchangeFundAnnualReturn: 10.0,
+                    postFundAnnualReturn: 10.0,
+                    inflation: 3.3,
+                    timeHorizon: 20,
+                    exchangeFundPeriod: 7,
+                    scenarioAER: 0.03,
+                    exchangeFundER: 1.25,
+                    postFundER: 0.03,
+                },
+                sensitivityChartMaxHorizon: 40,
             };
 
+            // Set Chart.js defaults for dark theme
+            Chart.defaults.color = config.palette.text;
+            Chart.defaults.borderColor = config.palette.border;
+
+            // --- STATE MANAGEMENT ---
             let chartDataForExport = [];
             let sensitivityDataForExport = [];
+            let taxDataForExport = [];
 
+            // --- DOM ELEMENT REFERENCES ---
             const inputs = {
                 currentValue: document.getElementById('currentValue'),
                 costBasis: document.getElementById('costBasis'),
@@ -433,6 +515,7 @@
                 taxToggle: document.getElementById('taxToggle'),
                 exportCsvBtn: document.getElementById('exportCsvBtn'),
                 exportSensitivityCsvBtn: document.getElementById('exportSensitivityCsvBtn'),
+                exportTaxesCsvBtn: document.getElementById('exportTaxesCsvBtn'),
             };
 
             const displays = {
@@ -448,13 +531,16 @@
                 postFundERValue: document.getElementById('postFundERValue'),
                 finalValueA: document.getElementById('finalValueA'),
                 nominalValueA: document.getElementById('nominalValueA'),
+                taxesPaidA: document.getElementById('taxesPaidA'),
                 finalValueB: document.getElementById('finalValueB'),
                 nominalValueB: document.getElementById('nominalValueB'),
+                taxesPaidB: document.getElementById('taxesPaidB'),
                 breakEvenER: document.getElementById('breakEvenER'),
                 resultContainer: document.getElementById('result-container'),
                 breakEvenIndicator: document.getElementById('breakEvenIndicator'),
             };
 
+            // --- FORMATTERS ---
             const currencyFormatter = new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',
@@ -464,37 +550,78 @@
 
             const numberFormatter = new Intl.NumberFormat('en-US');
 
-            let valueOverTimeChart, sensitivityChart;
+            // --- CHART INSTANCES ---
+            let valueOverTimeChart, sensitivityChart, taxChart;
 
+            // --- CHART UPDATE FUNCTIONS ---
             function updateValueOverTimeChart(labels, dataA, dataB, isPreTax) {
                 if (!valueOverTimeChart) return;
                 valueOverTimeChart.data.labels = labels;
                 valueOverTimeChart.data.datasets[0].data = dataA;
                 valueOverTimeChart.data.datasets[1].data = dataB;
                 valueOverTimeChart.options.scales.y.title.text = isPreTax ? 'Nominal Pre-Tax Value' : 'Real After-Tax Value';
-                valueOverTimeChart.options.plugins.tooltip.callbacks.title = function(tooltipItems) {
-                    if (tooltipItems.length > 0) {
-                        return `Year ${tooltipItems[0].label}`;
-                    }
-                    return '';
-                };
+                valueOverTimeChart.options.plugins.tooltip.callbacks.title = (tooltipItems) => tooltipItems.length > 0 ? `Year ${tooltipItems[0].label}`: '';
                 valueOverTimeChart.update();
+            }
+
+            function updateTaxChart(labels, taxDataA, taxDataB) {
+                if (!taxChart) return;
+                const option = {
+                    backgroundColor: 'transparent',
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'shadow' },
+                        backgroundColor: config.palette.tooltipBg,
+                        borderColor: config.palette.border,
+                        textStyle: { color: config.palette.tooltipText },
+                        formatter: (params) => {
+                            let tooltipText = `Year ${params[0].name}<br/>`;
+                            params.forEach(param => {
+                                tooltipText += `${param.marker} ${param.seriesName}: ${currencyFormatter.format(param.value)}<br/>`;
+                            });
+                            return tooltipText;
+                        }
+                    },
+                    legend: {
+                        data: ['Sell & Reinvest', 'Exchange Fund'],
+                        textStyle: { color: config.palette.tooltipText }
+                    },
+                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    xAxis: { type: 'category', data: labels, axisLabel: { color: config.palette.text } },
+                    yAxis: {
+                        type: 'value',
+                        name: 'Taxes Paid',
+                        nameTextStyle: { color: config.palette.text, padding: [0, 0, 0, 60] },
+                        axisLabel: {
+                            color: config.palette.text,
+                            formatter: (value) => {
+                                if (value >= 1e6) return currencyFormatter.format(value / 1e6) + 'M';
+                                if (value >= 1e3) return currencyFormatter.format(value / 1e3) + 'K';
+                                return currencyFormatter.format(value);
+                            }
+                        },
+                        splitLine: { lineStyle: { color: config.palette.border } }
+                    },
+                    series: [
+                        { name: 'Sell & Reinvest', type: 'bar', data: taxDataA, itemStyle: { color: config.palette.scenarioA } },
+                        { name: 'Exchange Fund', type: 'bar', data: taxDataB, itemStyle: { color: config.palette.scenarioB } }
+                    ]
+                };
+                taxChart.setOption(option);
             }
 
             function updateSensitivityChart(data) {
                 if (!sensitivityChart) return;
-                // Update both datasets with the same core data
-                sensitivityChart.data.datasets.forEach(dataset => {
-                    dataset.data = data;
-                });
+                sensitivityChart.data.datasets.forEach(dataset => { dataset.data = data; });
                 sensitivityChart.update();
             }
 
+            // --- UI UPDATE FUNCTION ---
             function updateDisplayValues() {
                  Object.keys(displays).forEach(key => {
-                    if (!inputs[key.replace('Value', '')] && !document.getElementById(key)) return;
                     const sliderId = key.replace('Value', '');
-                    if (inputs[sliderId] && inputs[sliderId].type === 'range') {
+                    if (!inputs[sliderId] || inputs[sliderId].type !== 'range') return;
+
                         const slider = inputs[sliderId];
                         const displayEl = displays[key];
                         const value = parseFloat(slider.value);
@@ -506,21 +633,19 @@
                         } else {
                             displayEl.textContent = `${value.toFixed(1)}%`;
                         }
-                    }
                 });
             }
 
+            // --- CORE CALCULATION LOGIC ---
             function calculate() {
-                const exchangeFundPeriodLabel = document.querySelector('label[for="exchangeFundPeriod"]');
-                const exchangeFundPeriodSlider = inputs.exchangeFundPeriod;
-                const exchangeFundPeriodValueDisplay = displays.exchangeFundPeriodValue;
                 const N = parseInt(inputs.timeHorizon.value, 10);
                 const exchangeFundPeriod = parseInt(inputs.exchangeFundPeriod.value, 10);
 
+                // --- Input Validation ---
                 const isError = exchangeFundPeriod > N;
-                exchangeFundPeriodLabel.classList.toggle('text-red-500', isError);
-                exchangeFundPeriodValueDisplay.classList.toggle('text-red-500', isError);
-                exchangeFundPeriodSlider.classList.toggle('slider-error', isError);
+                document.querySelector('label[for="exchangeFundPeriod"]').classList.toggle('text-red-500', isError);
+                displays.exchangeFundPeriodValue.classList.toggle('text-red-500', isError);
+                inputs.exchangeFundPeriod.classList.toggle('slider-error', isError);
 
                 if (isError) {
                     displays.resultContainer.innerHTML = `
@@ -528,18 +653,17 @@
                             <i class="fas fa-triangle-exclamation text-3xl text-red-500"></i>
                             <span class="text-xl md:text-2xl font-black text-red-400">Error: Exchange Fund Period cannot exceed Total Investment Horizon</span>
                         </div>`;
-                    displays.finalValueA.textContent = '–';
-                    displays.nominalValueA.textContent = '–';
-                    displays.finalValueB.textContent = '–';
-                    displays.nominalValueB.textContent = '–';
+                    ['finalValueA', 'nominalValueA', 'taxesPaidA', 'finalValueB', 'nominalValueB', 'taxesPaidB'].forEach(key => displays[key].textContent = '–');
                     displays.breakEvenER.textContent = 'N/A';
                     if (valueOverTimeChart) updateValueOverTimeChart([], [], [], true);
                     if (sensitivityChart) updateSensitivityChart([]);
+                    if (taxChart) updateTaxChart([], [], []);
                     return;
                 } else {
                      displays.resultContainer.innerHTML = '';
                 }
 
+                // --- Read Inputs ---
                 const V = parseFloat(inputs.currentValue.value.replace(/,/g, '')) || 0;
                 const B = parseFloat(inputs.costBasis.value.replace(/,/g, '')) || 0;
                 const T = parseFloat(inputs.taxRate.value) / 100 || 0;
@@ -550,14 +674,16 @@
                 const ER_low = parseFloat(inputs.scenarioAER.value) / 100 || 0;
                 const userSetER = parseFloat(inputs.exchangeFundER.value) / 100 || 0;
                 const postFundER = parseFloat(inputs.postFundER.value) / 100 || 0;
-                const showPreTax = inputs.taxToggle.checked;
+                const showRealAfterTax = inputs.taxToggle.checked;
 
+                // --- Core Financial Calculations ---
                 const R_A_nominal_net = R_A_nominal - ER_low;
 
                 // This is the initial gain (if V > B) or 0.
                 const initialGain = Math.max(0, V - B);
                 // This is the initial loss (if B > V) or 0. This is the carryforward amount.
                 const capitalLossCarryforward = Math.max(0, B - V);
+                const initialTaxA = initialGain * T;
 
                 const getNominalFutureValueB = (er_x, years) => {
                     const R_B_high_ER_net = R_B_nominal - er_x;
@@ -575,20 +701,16 @@
 
                 const calcScenarioA = (years) => {
                     // Principal is the after-tax proceeds from the initial sale.
-                    const principalA = V - (initialGain * T);
-                    const nominalFutureValue = principalA * Math.pow(1 + R_A_nominal_net, years);
+                    const principal = V - initialTaxA;
+                    const nominalFutureValue = principal * Math.pow(1 + R_A_nominal_net, years);
 
                     // Gain from the new investment.
-                    const reinvestmentGain = nominalFutureValue - principalA;
+                    const reinvestmentGain = nominalFutureValue - principal;
 
                     // The loss carryforward offsets the new gain.
                     const netTaxableGain = Math.max(0, reinvestmentGain - capitalLossCarryforward);
-
                     const futureTax = netTaxableGain * T;
-
-                    const nominalAfterTaxValue = nominalFutureValue - futureTax;
-
-                    return nominalAfterTaxValue / Math.pow(1 + I, years);
+                    return (nominalFutureValue - futureTax) / Math.pow(1 + I, years);
                 };
 
                 const calcScenarioB = (er_x, years) => {
@@ -597,43 +719,40 @@
                     const nominalGain = nominalFutureValue - B;
                     // Tax is only applied to positive gains.
                     const futureTax = Math.max(0, nominalGain) * T;
-                    const nominalAfterTaxValue = nominalFutureValue - futureTax;
-                    return nominalAfterTaxValue / Math.pow(1 + I, years);
+                    return (nominalFutureValue - futureTax) / Math.pow(1 + I, years);
                 };
 
-                const calcScenarioA_preTax = (years) => {
-                     const principalA = V - (initialGain * T);
-                    return principalA * Math.pow(1 + R_A_nominal_net, years);
-                };
+                const calcScenarioA_preTax = (years) => (V - initialTaxA) * Math.pow(1 + R_A_nominal_net, years);
+                const calcScenarioB_preTax = (er_x, years) => getNominalFutureValueB(er_x, years);
 
-                const calcScenarioB_preTax = (er_x, years) => {
-                    return getNominalFutureValueB(er_x, years);
-                };
-
+                // --- Final Value Calculations ---
                 const finalValueA = calcScenarioA(N);
                 const finalValueB = calcScenarioB(userSetER, N);
-                const nominalValueA = calcScenarioA_preTax(N);
-                const nominalValueB = calcScenarioB_preTax(userSetER, N);
+                const nominalFutureValueA = calcScenarioA_preTax(N);
+                const nominalFutureValueB = calcScenarioB_preTax(userSetER, N);
+
+                const reinvestmentGainA = nominalFutureValueA - (V - initialTaxA);
+                const finalTaxA = Math.max(0, reinvestmentGainA - capitalLossCarryforward) * T;
+                const totalTaxA = initialTaxA + finalTaxA;
+                const totalTaxB = Math.max(0, nominalFutureValueB - B) * T;
 
                 let breakEvenER = 0;
                 if (exchangeFundPeriod > 0 && N > 0) {
-                    let high = R_B_nominal;
-                    let low = -1;
+                    let high = R_B_nominal, low = -1;
                     for (let i = 0; i < 50; i++) {
                         let mid = (high + low) / 2;
-                        if (calcScenarioB(mid, N) > finalValueA) {
-                            low = mid;
-                        } else {
-                            high = mid;
-                        }
+                        calcScenarioB(mid, N) > finalValueA ? low = mid : high = mid;
                     }
                     breakEvenER = low;
                 }
 
+                // --- Update UI Displays ---
                 displays.finalValueA.textContent = currencyFormatter.format(finalValueA);
-                displays.nominalValueA.textContent = currencyFormatter.format(nominalValueA);
+                displays.nominalValueA.textContent = currencyFormatter.format(nominalFutureValueA);
+                displays.taxesPaidA.textContent = currencyFormatter.format(totalTaxA);
                 displays.finalValueB.textContent = currencyFormatter.format(finalValueB);
-                displays.nominalValueB.textContent = currencyFormatter.format(nominalValueB);
+                displays.nominalValueB.textContent = currencyFormatter.format(nominalFutureValueB);
+                displays.taxesPaidB.textContent = currencyFormatter.format(totalTaxB);
 
                 const breakEvenERPercentage = breakEvenER * 100;
                 const roundedDownER = Math.floor(breakEvenERPercentage * 100) / 100;
@@ -641,162 +760,116 @@
 
                 // Update Break-Even Indicator
                 if (breakEvenER > 0) {
-                    if (userSetER * 100 < roundedDownER) {
-                        displays.breakEvenIndicator.textContent = 'Good';
-                        displays.breakEvenIndicator.className = 'text-xs font-bold px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-400 ml-2';
-                    } else {
-                        displays.breakEvenIndicator.textContent = 'High';
-                        displays.breakEvenIndicator.className = 'text-xs font-bold px-2 py-1 rounded-md bg-amber-500/20 text-amber-400 ml-2';
-                    }
+                    const isGood = userSetER * 100 < roundedDownER;
+                    displays.breakEvenIndicator.textContent = isGood ? 'Good' : 'High';
+                    displays.breakEvenIndicator.className = `text-xs font-bold px-2 py-1 rounded-md ml-2 ${isGood ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`;
                 } else {
                     displays.breakEvenIndicator.textContent = '';
-                    displays.breakEvenIndicator.className = '';
                 }
 
-
+                // --- Prepare and Update Charts ---
                 const labels = Array.from({ length: N + 1 }, (_, i) => i);
                 const valueDataA = labels.map(year => calcScenarioA(year));
                 const valueDataB = labels.map(year => calcScenarioB(userSetER, year));
                 const preTaxDataA = labels.map(year => calcScenarioA_preTax(year));
                 const preTaxDataB = labels.map(year => calcScenarioB_preTax(userSetER, year));
+                updateValueOverTimeChart(labels, showRealAfterTax ? valueDataA : preTaxDataA, showRealAfterTax ? valueDataB : preTaxDataB, !showRealAfterTax);
 
-                chartDataForExport = labels.map((year, i) => ({
-                    year: year,
-                    real_after_tax_a: valueDataA[i],
-                    nominal_pre_tax_a: preTaxDataA[i],
-                    real_after_tax_b: valueDataB[i],
-                    nominal_pre_tax_b: preTaxDataB[i],
-                }));
-
-                updateValueOverTimeChart(labels, showPreTax ? preTaxDataA : valueDataA, showPreTax ? preTaxDataB : valueDataB, showPreTax);
+                const yearlyTaxA = Array(N + 1).fill(0);
+                if (N > 0) { yearlyTaxA[0] = initialTaxA; yearlyTaxA[N] = finalTaxA; }
+                else { yearlyTaxA[0] = totalTaxA; }
+                const yearlyTaxB = Array(N + 1).fill(0);
+                if (N >= 0) yearlyTaxB[N] = totalTaxB;
+                updateTaxChart(labels, yearlyTaxA, yearlyTaxB);
 
                 sensitivityDataForExport = [];
-                for (let year = 1; year <= 40; year++) {
+                for (let year = 1; year <= config.sensitivityChartMaxHorizon; year++) {
                     let yearBreakEven = 0;
                      if (year > 0) {
-                        let h_sens = R_B_nominal, l_sens = -1;
+                        let h = R_B_nominal, l = -1;
                         for (let i = 0; i < 50; i++) {
-                            let m = (h_sens + l_sens) / 2;
-                            if (calcScenarioB(m, year) > calcScenarioA(year)) {
-                            l_sens = m;
-                            } else {
-                            h_sens = m;
-                            }
+                            let m = (h + l) / 2;
+                            calcScenarioB(m, year) > calcScenarioA(year) ? l = m : h = m;
                         }
-                        yearBreakEven = l_sens;
+                        yearBreakEven = l;
                     }
                     sensitivityDataForExport.push({ x: year, y: yearBreakEven * 100 });
                 }
                 updateSensitivityChart(sensitivityDataForExport);
 
-                // Highlight winner
+                // --- Prepare Data for CSV Export ---
+                taxDataForExport = labels.map((year, i) => ({ year, tax_a: yearlyTaxA[i], tax_b: yearlyTaxB[i] }));
+                chartDataForExport = labels.map((year, i) => ({
+                    year,
+                    real_after_tax_a: valueDataA[i],
+                    nominal_pre_tax_a: preTaxDataA[i],
+                    total_tax_a: yearlyTaxA[i],
+                    real_after_tax_b: valueDataB[i],
+                    nominal_pre_tax_b: preTaxDataB[i],
+                    total_tax_b: yearlyTaxB[i],
+                }));
+
+                // --- Update Winner/Loser Highlighting ---
                 const sellReinvestBox = document.getElementById('sellReinvestBox');
                 const exchangeFundBox = document.getElementById('exchangeFundBox');
 
-                const baseClasses = ['p-4', 'rounded-2xl', 'text-center', 'flex', 'flex-col', 'justify-between', 'transition-all', 'duration-300', 'bg-gray-900', 'border-2'];
-                const winnerClassesA = ['bg-[#f6935f]/10', 'border-[#f6935f]', 'shadow-2xl'];
-                const winnerClassesB = ['bg-cyan-400/10', 'border-cyan-400', 'shadow-2xl'];
-                const loserClasses = ['border-gray-700', 'opacity-75'];
-
-                sellReinvestBox.className = baseClasses.join(' ');
-                exchangeFundBox.className = baseClasses.join(' ');
+                // Reset styles
+                sellReinvestBox.style.backgroundColor = '';
+                sellReinvestBox.style.borderColor = config.palette.border;
+                sellReinvestBox.style.opacity = '1';
+                exchangeFundBox.style.backgroundColor = '';
+                exchangeFundBox.style.borderColor = config.palette.border;
+                exchangeFundBox.style.opacity = '1';
 
                 let resultHTML = '';
-                if (Math.abs(finalValueA - finalValueB) < 1) { // Tie condition
-                    sellReinvestBox.classList.add('border-gray-700');
-                    exchangeFundBox.classList.add('border-gray-700');
-                    resultHTML = `
-                        <div class="bg-gray-700/50 border border-gray-500 rounded-lg p-4 flex items-center justify-center gap-3">
-                            <span class="fa-stack fa-1x">
-                                <i class="fas fa-circle fa-stack-2x text-gray-600"></i>
-                                <i class="fas fa-equals fa-stack-1x fa-inverse text-gray-300"></i>
-                            </span>
-                            <span class="text-2xl md:text-3xl font-black text-white">Outcomes are effectively the same</span>
-                        </div>`;
+                if (Math.abs(finalValueA - finalValueB) < 1) {
+                    // Tie
+                    resultHTML = `<div class="bg-[${config.palette.tie.bg}]/50 border border-[${config.palette.tie.border}] rounded-lg p-4 flex items-center justify-center gap-3"><span class="fa-stack fa-1x"><i class="fas fa-circle fa-stack-2x text-[${config.palette.tie.icon_base}]"></i><i class="fas fa-equals fa-stack-1x fa-inverse text-[${config.palette.tie.icon_symbol}]"></i></span><span class="text-2xl md:text-3xl font-black text-[${config.palette.tie.text}]">Outcomes are effectively the same</span></div>`;
                 } else if (finalValueA > finalValueB) {
-                    sellReinvestBox.classList.add(...winnerClassesA);
-                    exchangeFundBox.classList.add(...loserClasses);
-                    resultHTML = `
-                        <div class="bg-[#f6935f]/10 border border-[#f6935f] rounded-lg p-4 flex items-center justify-center gap-3">
-                            <span class="fa-stack fa-1x">
-                                <i class="fas fa-circle fa-stack-2x text-[#f6935f]/80"></i>
-                                <i class="fas fa-seedling fa-stack-1x fa-inverse text-gray-900"></i>
-                            </span>
-                            <span class="text-2xl md:text-3xl font-black text-[#f6935f]">Sell & Reinvest is Better</span>
-                        </div>`;
+                    // A wins
+                    sellReinvestBox.style.backgroundColor = config.palette.scenarioA_bg;
+                    sellReinvestBox.style.borderColor = config.palette.scenarioA;
+                    exchangeFundBox.style.opacity = '0.75';
+                    resultHTML = `<div class="bg-[${config.palette.scenarioA}]/10 border border-[${config.palette.scenarioA}] rounded-lg p-4 flex items-center justify-center gap-3"><span class="fa-stack fa-1x"><i class="fas fa-circle fa-stack-2x text-[${config.palette.scenarioA}]/80"></i><i class="fas fa-seedling fa-stack-1x fa-inverse text-gray-900"></i></span><span class="text-2xl md:text-3xl font-black text-[${config.palette.scenarioA}]">Sell & Reinvest is Better</span></div>`;
                 } else {
-                    exchangeFundBox.classList.add(...winnerClassesB);
-                    sellReinvestBox.classList.add(...loserClasses);
-                    resultHTML = `
-                        <div class="bg-cyan-400/10 border border-cyan-400 rounded-lg p-4 flex items-center justify-center gap-3">
-                           <span class="fa-stack fa-1x">
-                                <i class="fas fa-circle fa-stack-2x text-cyan-400/80"></i>
-                                <i class="fas fa-rotate fa-stack-1x fa-inverse text-gray-900"></i>
-                            </span>
-                            <span class="text-2xl md:text-3xl font-black text-cyan-400">Exchange Fund is Better</span>
-                        </div>`;
+                    // B wins
+                    exchangeFundBox.style.backgroundColor = config.palette.scenarioB_bg;
+                    exchangeFundBox.style.borderColor = config.palette.scenarioB;
+                    sellReinvestBox.style.opacity = '0.75';
+                    resultHTML = `<div class="bg-[${config.palette.scenarioB}]/10 border border-[${config.palette.scenarioB}] rounded-lg p-4 flex items-center justify-center gap-3"><span class="fa-stack fa-1x"><i class="fas fa-circle fa-stack-2x text-[${config.palette.scenarioB}]/80"></i><i class="fas fa-rotate fa-stack-1x fa-inverse text-gray-900"></i></span><span class="text-2xl md:text-3xl font-black text-[${config.palette.scenarioB}]">Exchange Fund is Better</span></div>`;
                 }
                 displays.resultContainer.innerHTML = resultHTML;
             }
 
+            // --- CHART CREATION ---
             function createCharts() {
-                const valueCtx = document.getElementById('valueOverTimeChart').getContext('2d');
-                valueOverTimeChart = new Chart(valueCtx, {
+                valueOverTimeChart = new Chart(document.getElementById('valueOverTimeChart').getContext('2d'), {
                     type: 'line',
                     data: {
-                        labels: [],
-                        datasets: [{
-                            label: 'Sell & Reinvest',
-                            data: [],
-                            borderColor: palette.scenarioA,
-                            backgroundColor: palette.scenarioA_value_over_time_chart_bg,
-                            fill: false,
-                            tension: 0.1
-                        }, {
-                            label: 'Exchange Fund',
-                            data: [],
-                            borderColor: palette.scenarioB,
-                            backgroundColor: palette.scenarioB_value_over_time_chart_bg,
-                            fill: false,
-                            tension: 0.1
-                        }]
+                        datasets: [
+                            { label: 'Sell & Reinvest', borderColor: config.palette.scenarioA, backgroundColor: config.palette.scenarioA, fill: false, tension: 0.1, pointRadius: 3 },
+                            { label: 'Exchange Fund', borderColor: config.palette.scenarioB, backgroundColor: config.palette.scenarioB, fill: false, tension: 0.1, pointRadius: 3 }
+                        ]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                        responsive: true, maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'top', labels: { color: '#D1D5DB' } },
+                            legend: { position: 'top', labels: { color: config.palette.tooltipText } },
                             tooltip: {
-                                mode: 'index',
-                                intersect: false,
+                                mode: 'index', intersect: false,
                                 callbacks: {
-                                    title: function(tooltipItems) {
-                                        if (tooltipItems.length > 0) {
-                                            return `Year ${tooltipItems[0].label}`;
-                                        }
-                                        return '';
-                                    },
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) { label += ': '; }
-                                        if (context.parsed.y !== null) {
-                                            label += currencyFormatter.format(context.parsed.y);
-                                        }
-                                        return label;
-                                    }
+                                    title: (items) => items.length ? `Year ${items[0].label}` : '',
+                                    label: (context) => `${context.dataset.label || ''}: ${currencyFormatter.format(context.parsed.y)}`
                                 }
                             }
                         },
                         scales: {
-                             x: {
-                                title: { display: true, text: 'Year' },
-                                ticks: { color: '#9CA3AF' }
-                            },
+                            x: { title: { display: true, text: 'Year' }, ticks: { color: config.palette.text } },
                             y: {
                                 title: { display: true, text: 'Real After-Tax Value' },
                                 ticks: {
-                                    color: '#9CA3AF',
-                                    callback: function(value) {
+                                    color: config.palette.text,
+                                    callback: (value) => {
                                         if (value >= 1e9) return currencyFormatter.format(value / 1e9) + 'B';
                                         if (value >= 1e6) return currencyFormatter.format(value / 1e6) + 'M';
                                         if (value >= 1e3) return currencyFormatter.format(value / 1e3) + 'K';
@@ -812,185 +885,132 @@
                 const annotationPlugin = {
                     id: 'chartAnnotations',
                     beforeDatasetsDraw: (chart) => {
-                        const ctx = chart.ctx;
-                        const chartArea = chart.chartArea;
-
-                        function wrapText(context, text, x, y, maxWidth, lineHeight) {
-                            const words = text.split(' ');
-                            let line = '';
-                            let testLine;
-                            let lineArray = [];
-
+                        const { ctx, chartArea } = chart;
+                        const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
+                            const words = text.split(' '); let line = ''; let lineArray = [];
                             for(let n = 0; n < words.length; n++) {
-                                testLine = line + words[n] + ' ';
-                                const metrics = context.measureText(testLine);
-                                const testWidth = metrics.width;
-                                if (testWidth > maxWidth && n > 0) {
-                                    lineArray.push(line);
-                                    line = words[n] + ' ';
-                                } else {
-                                    line = testLine;
-                                }
+                                let testLine = line + words[n] + ' ';
+                                if (context.measureText(testLine).width > maxWidth && n > 0) { lineArray.push(line); line = words[n] + ' '; }
+                                else { line = testLine; }
                             }
                             lineArray.push(line);
-
-                            for(let k = 0; k < lineArray.length; k++) {
-                                context.fillText(lineArray[k], x, y + (k * lineHeight));
-                            }
-                        }
-
+                            for(let k = 0; k < lineArray.length; k++) context.fillText(lineArray[k], x, y + (k * lineHeight));
+                        };
                         ctx.save();
-
-                        // Calculate a dynamic font size based on chart width
-                        const baseSize = chart.width / 25;
-                        const fontSize = Math.max(12, Math.min(30, baseSize)); // Clamp between 12px and 30px
-
-                        // Use the dynamic font size
+                        const fontSize = Math.max(12, Math.min(30, chart.width / 25));
                         ctx.font = `600 ${fontSize}px Inter`;
 
                         // Define text properties
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-
-                        const textTop = 'Sell & Reinvest is Better';
-                        const textBottom = 'Exchange Fund is Better';
-                        const padding = 20;
-                        const maxWidth = chartArea.width - (padding * 2);
-                        const lineHeight = fontSize * 1.2;
-
-                        ctx.textAlign = 'left';
-                        ctx.textBaseline = 'top';
-                        wrapText(ctx, textTop, chartArea.left + padding, chartArea.top + padding, maxWidth, lineHeight);
-
-                        ctx.textAlign = 'right';
-                        ctx.textBaseline = 'bottom';
-                        wrapText(ctx, textBottom, chartArea.right - padding, chartArea.bottom - padding, maxWidth, lineHeight);
-
+                        const padding = 20; const maxWidth = chartArea.width - (padding * 2); const lineHeight = fontSize * 1.2;
+                        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                        wrapText(ctx, 'Sell & Reinvest is Better', chartArea.left + padding, chartArea.top + padding, maxWidth, lineHeight);
+                        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                        wrapText(ctx, 'Exchange Fund is Better', chartArea.right - padding, chartArea.bottom - padding, maxWidth, lineHeight);
                         ctx.restore();
                     }
                 };
 
-                const sensitivityCtx = document.getElementById('sensitivityChart').getContext('2d');
-                sensitivityChart = new Chart(sensitivityCtx, {
+                sensitivityChart = new Chart(document.getElementById('sensitivityChart').getContext('2d'), {
                     type: 'line',
                     data: {
                         datasets: [
-                        {
-                            label: 'Break-Even Expense Ratio',
-                            data: [],
-                            borderColor: 'rgba(52, 211, 153, 1.0)',
-                            borderWidth: 3,
-                            backgroundColor: palette.scenarioB_sensitivity_chart_bg,
-                            fill: 'start',
-                            tension: 0.4,
-                            pointRadius: 2,
-                            pointBackgroundColor: 'rgba(52, 211, 153, 1.0)',
-                            pointBorderColor: 'rgba(52, 211, 153, 1.0)',
-                            pointBorderWidth: 2,
-                        },
-                        {
-                            label: 'Area where Sell & Reinvest is better',
-                            data: [],
-                            borderColor: 'transparent',
-                            borderWidth: 0,
-                            backgroundColor: palette.scenarioA_sensitivity_chart_bg,
-                            fill: 'end',
-                            tension: 0.4,
-                            pointRadius: 0,
-                        }]
+                            { label: 'Break-Even Expense Ratio', borderColor: config.palette.winner, borderWidth: 3, backgroundColor: config.palette.scenarioB_sensitivity_chart_bg, fill: 'start', tension: 0.4, pointRadius: 2, pointBackgroundColor: config.palette.winner, pointBorderColor: config.palette.winner, pointBorderWidth: 2 },
+                            { label: 'Area where Sell & Reinvest is better', borderColor: 'transparent', borderWidth: 0, backgroundColor: config.palette.scenarioA_sensitivity_chart_bg, fill: 'end', tension: 0.4, pointRadius: 0 }
+                        ]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                        responsive: true, maintainAspectRatio: false,
                         plugins: {
                             legend: { display: false },
                             tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                filter: function(tooltipItem) {
-                                    return tooltipItem.dataset.label === 'Break-Even Expense Ratio';
-                                },
+                                mode: 'index', intersect: false,
+                                filter: (item) => item.dataset.label === 'Break-Even Expense Ratio',
                                 callbacks: {
-                                     title: function(tooltipItems) {
-                                        if (tooltipItems.length > 0) { return `Year ${tooltipItems[0].raw.x}`; }
-                                        return '';
-                                    },
-                                    label: function(context) {
-                                        return `Break-even Expense Ratio: ${context.raw.y.toFixed(2)}%`;
-                                    },
-                                    labelColor: function(context) {
-                                        return {
-                                            borderColor: palette.winner,
-                                            backgroundColor: palette.winner
-                                        };
-                                    }
+                                     title: (items) => items.length ? `Year ${items[0].raw.x}`: '',
+                                     label: (context) => `Break-even Expense Ratio: ${context.raw.y.toFixed(2)}%`,
+                                     labelColor: () => ({ borderColor: config.palette.winner, backgroundColor: config.palette.winner })
                                 }
                             }
                         },
                         scales: {
-                            x: {
-                                type: 'linear',
-                                title: { display: true, text: 'Investment Time Horizon (Years)' },
-                                min: 1,
-                                ticks: { color: '#9CA3AF' }
-                            },
-                            y: {
-                                title: { display: true, text: 'Break-Even Expense Ratio (%)' },
-                                beginAtZero: false,
-                                ticks: { color: '#9CA3AF' }
-                            }
+                            x: { type: 'linear', title: { display: true, text: 'Investment Time Horizon (Years)' }, min: 1, ticks: { color: config.palette.text } },
+                            y: { title: { display: true, text: 'Break-Even Expense Ratio (%)' }, beginAtZero: false, ticks: { color: config.palette.text } }
                         }
                     },
-                    plugins: [annotationPlugin] // Register the custom plugin
+                    plugins: [annotationPlugin]
                 });
+
+                taxChart = echarts.init(document.getElementById('taxChart'));
             }
 
-
+            // --- CSV EXPORT ---
             function exportToCsv(data, filename) {
                 let csvContent = "data:text/csv;charset=utf-8,";
-
+                const formatForCsv = (num) => `"${num.toFixed(2)}"`;
                 if (filename === 'Scenario_Comparison.csv') {
-                    csvContent += "Year,Sell_Reinvest_Nominal_Pre_Tax,Sell_Reinvest_Real_After_Tax,Exchange_Fund_Nominal_Pre_Tax,Exchange_Fund_Real_After_Tax\r\n";
-                    const formatForCsv = (num) => `"${num.toFixed(2)}"`;
-                     data.forEach(row => {
-                        const rowArray = [
-                            row.year,
-                            formatForCsv(row.nominal_pre_tax_a),
-                            formatForCsv(row.real_after_tax_a),
-                            formatForCsv(row.nominal_pre_tax_b),
-                            formatForCsv(row.real_after_tax_b)
-                        ];
-                        csvContent += rowArray.join(",") + "\r\n";
-                    });
-                } else {
+                    csvContent += "Year,Sell_Reinvest_Nominal_Pre_Tax,Sell_Reinvest_Real_After_Tax,Sell_Reinvest_Taxes_Paid,Exchange_Fund_Nominal_Pre_Tax,Exchange_Fund_Real_After_Tax,Exchange_Fund_Taxes_Paid\r\n";
+                     data.forEach(row => { csvContent += [row.year, formatForCsv(row.nominal_pre_tax_a), formatForCsv(row.real_after_tax_a), formatForCsv(row.total_tax_a), formatForCsv(row.nominal_pre_tax_b), formatForCsv(row.real_after_tax_b), formatForCsv(row.total_tax_b)].join(",") + "\r\n"; });
+                } else if (filename === 'Break_Even_Expense_Ratio_VS_Time_Horizon.csv') {
                      csvContent += "Year,Break_Even_Expense_Ratio\r\n";
-                     data.forEach(row => {
-                        csvContent += `${row.x},"${row.y.toFixed(4)}%"\r\n`;
-                    });
+                     data.forEach(row => { csvContent += `${row.x},"${row.y.toFixed(4)}%"\r\n`; });
+                } else if (filename === 'Taxes_Paid_Over_Time.csv') {
+                    csvContent += "Year,Sell_Reinvest_Taxes_Paid,Exchange_Fund_Taxes_Paid\r\n";
+                    data.forEach(row => { csvContent += [row.year, formatForCsv(row.tax_a), formatForCsv(row.tax_b)].join(",") + "\r\n"; });
                 }
-
-                const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
+                link.setAttribute("href", encodeURI(csvContent));
                 link.setAttribute("download", filename);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             }
 
-            function setupEventListeners() {
-                [inputs.currentValue, inputs.costBasis].forEach(input => {
-                    input.addEventListener('focus', (e) => {
-                        if (e.target.value) { e.target.value = e.target.value.replace(/,/g, ''); }
-                    });
-                    input.addEventListener('blur', (e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value)) { e.target.value = numberFormatter.format(value); } else { e.target.value = ''; }
-                        calculate();
-                    });
+            // --- TOOLTIP POSITIONING ---
+            function adjustTooltipPosition(tooltip) {
+                // Reset styles to default (centered above the icon) to measure it correctly
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translateX(-50%)';
+                tooltip.style.right = 'auto';
+
+                // We need to get the new bounding client rect after applying the styles
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+
+                // Check for overflow and adjust
+                const buffer = 16; // 1rem buffer from viewport edges
+                if (tooltipRect.left < buffer) {
+                    tooltip.style.left = '0';
+                    tooltip.style.right = 'auto';
+                    tooltip.style.transform = `translateX(${buffer}px)`; // Add buffer
+                } else if (tooltipRect.right > viewportWidth - buffer) {
+                    tooltip.style.left = 'auto';
+                    tooltip.style.right = '0';
+                    tooltip.style.transform = `translateX(-${buffer}px)`; // Add buffer
+                }
+            }
+
+
+            // --- INITIALIZATION ---
+            function initialize() {
+                // Set initial input values from config
+                Object.keys(config.initialInputs).forEach(key => {
+                    if (inputs[key]) {
+                        inputs[key].value = config.initialInputs[key];
+                    }
                 });
 
+                // Setup event listeners for inputs
                 Object.values(inputs).forEach(input => {
-                     if (input.type !== 'text' && !input.id.includes('CsvBtn')) {
+                    if (input.id.includes('CsvBtn')) return;
+                    if (input.type === 'text') {
+                        input.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g, ''); });
+                    input.addEventListener('blur', (e) => {
+                        const value = parseFloat(e.target.value);
+                            e.target.value = isNaN(value) ? '' : numberFormatter.format(value);
+                        calculate();
+                    });
+                    } else {
                         input.addEventListener('input', () => {
                             updateDisplayValues();
                             calculate();
@@ -998,14 +1018,54 @@
                     }
                 });
 
+                // Setup event listeners for CSV buttons
                 inputs.exportCsvBtn.addEventListener('click', () => exportToCsv(chartDataForExport, 'Scenario_Comparison.csv'));
                 inputs.exportSensitivityCsvBtn.addEventListener('click', () => exportToCsv(sensitivityDataForExport, 'Break_Even_Expense_Ratio_VS_Time_Horizon.csv'));
-            }
+                inputs.exportTaxesCsvBtn.addEventListener('click', () => exportToCsv(taxDataForExport, 'Taxes_Paid_Over_Time.csv'));
+
+                // Setup event listeners for tooltips
+                document.querySelectorAll('.cursor-help').forEach(icon => {
+                    const tooltip = icon.nextElementSibling;
+                    icon.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isCurrentlyVisible = tooltip.classList.contains('tooltip-visible');
+
+                        // Hide all other tooltips first
+                        document.querySelectorAll('.tooltip.tooltip-visible').forEach(visibleTooltip => {
+                            visibleTooltip.classList.remove('tooltip-visible');
+                        });
+
+                        // If the clicked tooltip was not visible, show it and adjust its position.
+                        if (!isCurrentlyVisible) {
+                            tooltip.classList.add('tooltip-visible');
+                            adjustTooltipPosition(tooltip);
+                        }
+                        // If it was already visible, the loop above has already hidden it, so it's now closed.
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    // Hide all tooltips if clicking anywhere else on the page, except on the help icon itself.
+                    if (!e.target.classList.contains('cursor-help')) {
+                        document.querySelectorAll('.tooltip.tooltip-visible').forEach(tooltip => {
+                            tooltip.classList.remove('tooltip-visible');
+                        });
+                    }
+                });
+
+                // Resize listener for charts
+                window.addEventListener('resize', () => {
+                    if(valueOverTimeChart) valueOverTimeChart.resize();
+                    if(sensitivityChart) sensitivityChart.resize();
+                    if(taxChart) taxChart.resize();
+                });
 
             createCharts();
-            setupEventListeners();
             updateDisplayValues();
             calculate();
+            }
+
+            initialize();
         });
     </script>
 </body>
